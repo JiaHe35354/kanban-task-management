@@ -1,0 +1,78 @@
+.navbar {
+  height: 100%;
+  background-color: var(--background);
+  color: var(--text-color2);
+  padding: 1.5rem 2.5rem 5rem 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nav-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2.4px;
+  margin-bottom: 2rem;
+  padding-left: 3rem;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 1.5rem;
+  padding-left: 3rem;
+
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.list-item:first-child {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+.create-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--main-purple);
+  margin-top: 1.5rem;
+  padding-left: 3rem;
+
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.controls-section {
+  margin-left: 2rem;
+}
+
+.hide-sidebar-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-color2);
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
