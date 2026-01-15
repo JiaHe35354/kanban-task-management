@@ -5,6 +5,7 @@
       "columns": [
         {
           "name": "Todo",
+          "color": "#49c4e5",
           "tasks": [
             {
               "title": "Build UI for onboarding flow",
@@ -13,7 +14,7 @@
               "subtasks": [
                 {
                   "title": "Sign up page",
-                  "isCompleted": true
+                  "isCompleted": false
                 },
                 {
                   "title": "Sign in page",
@@ -70,6 +71,7 @@
         },
         {
           "name": "Doing",
+          "color": "#8471f2",
           "tasks": [
             {
               "title": "Design settings and search pages",
@@ -181,6 +183,7 @@
         },
         {
           "name": "Done",
+          "color": "#67e2ae",
           "tasks": [
             {
               "title": "Conduct 5 wireframe tests",
@@ -288,6 +291,7 @@
       "columns": [
         {
           "name": "Todo",
+          "color": "#49c4e5",
           "tasks": [
             {
               "title": "Plan Product Hunt launch",
@@ -366,10 +370,12 @@
         },
         {
           "name": "Doing",
+          "color": "#8471f2",
           "tasks": []
         },
         {
           "name": "Done",
+          "color": "#67e2ae",
           "tasks": []
         }
       ]
@@ -379,11 +385,12 @@
       "columns": [
         {
           "name": "Now",
+          "color": "#49c4e5",
           "tasks": [
             {
               "title": "Launch version one",
               "description": "",
-              "status": "",
+              "status": "Now",
               "subtasks": [
                 {
                   "title": "Launch privately to our waitlist",
@@ -398,7 +405,7 @@
             {
               "title": "Review early feedback and plan next steps for roadmap",
               "description": "Beyond the initial launch, we're keeping the initial roadmap completely empty. This meeting will help us plan out our next steps based on actual customer feedback.",
-              "status": "",
+              "status": "Now",
               "subtasks": [
                 {
                   "title": "Interview 10 customers",
@@ -418,10 +425,12 @@
         },
         {
           "name": "Next",
+          "color": "#8471f2",
           "tasks": []
         },
         {
           "name": "Later",
+          "color": "#67e2ae",
           "tasks": []
         }
       ]

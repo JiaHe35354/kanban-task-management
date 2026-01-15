@@ -1,8 +1,6 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
-
-import HeaderLogo from "@/components/sidebar/HeaderLogo";
-import Sidebar from "@/components/sidebar/Sidebar";
-import Header from "@/components/header/Header";
+import Providers from "./providers";
+import MainContent from "@/components/main-content/MainContent";
 
 import "./globals.css";
 
@@ -21,16 +19,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={plusJakartaSans.className}>
       <body className="light">
-        <div className="appLayout">
-          <aside className="sidebarColumn">
-            <HeaderLogo />
-            <Sidebar />
-          </aside>
+        <Providers>
+          <div id="modal"></div>
 
-          <Header />
-
-          <main className="main-content">{children}</main>
-        </div>
+          <MainContent>{children}</MainContent>
+        </Providers>
       </body>
     </html>
   );

@@ -1,0 +1,33 @@
+.taskList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+
+.taskListItem {
+  background-color: var(--background);
+  padding: 2.3rem 1.8rem;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.5rem 0.8rem rgba(151, 151, 151, 0.15);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.taskListItem:hover,
+.taskListItem:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 1rem 2rem rgba(151, 151, 151, 0.15);
+}
+
+.taskTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.8rem;
+}
+
+.subtasks {
+  color: var(--text-color2);
+  font-size: 1.2rem;
+  font-weight: bold;
+}

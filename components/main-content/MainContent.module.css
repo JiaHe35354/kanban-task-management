@@ -1,0 +1,83 @@
+/* LAYOUT */
+.appLayout {
+  display: grid;
+  grid-template-rows: 9.7rem 1fr;
+  height: 100vh;
+
+  transition: grid-template-columns 0.3s ease-in;
+}
+
+.sidebarOpen {
+  grid-template-columns: 30rem 1fr;
+}
+
+.sidebarClosed {
+  grid-template-columns: 0 1fr;
+}
+
+.sidebarColumn {
+  grid-column: 1 / 2;
+  grid-row: 2 / -1;
+  background-color: var(--background);
+  border-right: 1px solid var(--line);
+  overflow: visible;
+  position: relative;
+}
+
+.sidebarBody {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 30rem;
+  height: 100%;
+  background-color: var(--background);
+  border-right: 1px solid var(--line);
+
+  transition: transform 0.3s ease-in, opacity 0.2s ease-in;
+}
+
+.open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.closed {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+.mainContent {
+  grid-column: 2 / -1;
+  grid-row: 2 / -1;
+  overflow: hidden;
+
+  position: relative;
+  /*   
+  display: flex;
+  justify-content: center;
+  align-items: center; */
+}
+
+.btnShow {
+  background: transparent;
+  border: none;
+  width: 5.6rem;
+  height: 4.8rem;
+  background-color: var(--main-purple);
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  position: absolute;
+  bottom: 3rem;
+  left: 0rem;
+  transition: var(--transition);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnShow:hover {
+  background-color: var(--purple-hover);
+}

@@ -9,7 +9,7 @@
   justify-content: space-between;
 }
 
-.nav-title {
+.navTitle {
   font-size: 1.2rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -20,30 +20,39 @@
 
 .list {
   list-style: none;
-  display: flex;
-  flex-direction: column;
 }
 
-.list-item {
+.list .iconHide {
+}
+
+.listItem {
   font-size: 1.5rem;
   font-weight: bold;
   padding: 1.5rem;
   padding-left: 3rem;
+  cursor: pointer;
+  transition: var(--transition);
 
   display: flex;
   align-items: center;
   gap: 1.8rem;
 }
 
-.list-item:first-child {
-  background-color: var(--btn-bg);
-  color: var(--btn-text);
+.listItem:hover {
+  background-color: var(--bg-sidebar-hover);
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
+  color: var(--main-purple);
+}
 
+.listItem.active {
+  background-color: var(--btn-bg-primary);
+  color: var(--btn-text-primary);
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
 }
 
-.create-btn {
+.createBtn {
   background: none;
   border: none;
   font-family: inherit;
@@ -52,27 +61,40 @@
   color: var(--main-purple);
   margin-top: 1.5rem;
   padding-left: 3rem;
+  cursor: pointer;
+  transition: var(--transition);
 
   display: flex;
   align-items: center;
   gap: 1.8rem;
 }
 
-.controls-section {
-  margin-left: 2rem;
+.createBtn:hover {
+  color: var(--purple-hover);
 }
 
-.hide-sidebar-btn {
+.hideSidebarBtn {
   background: transparent;
   border: none;
+  width: 100%;
   color: var(--text-color2);
   font-family: inherit;
   font-size: 1.5rem;
   font-weight: bold;
-  margin-top: 2rem;
+  margin-top: 0.8rem;
+  padding: 1.5rem;
+  padding-left: 2rem;
   cursor: pointer;
+  transition: var(--transition);
 
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+.hideSidebarBtn:hover {
+  color: var(--main-purple);
+  background-color: var(--bg-sidebar-hover);
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
 }

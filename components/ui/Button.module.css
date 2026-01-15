@@ -1,0 +1,64 @@
+.btn {
+  border: none;
+
+  color: var(--btn-text);
+  background-color: var(--btn-bg);
+
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 0.8rem 3rem;
+  border-radius: 50px;
+  margin-right: 1.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.bgPurple {
+  background-color: var(--btn-bg);
+}
+
+.bgPurple:hover {
+  background-color: var(--purple-hover);
+  opacity: 1;
+}
+
+.bgPurpleLight {
+  background-color: var(--btn-bg-light);
+}
+
+.bgRed {
+  background-color: var(--color-red);
+}
+
+.bgRed:hover {
+  background-color: var(--red-hover);
+}
+
+.textPurple {
+  color: var(--main-purple);
+}
+
+.fontSmall {
+  font-size: 1.3rem;
+}
+
+.fontMedium {
+  font-size: 1.5rem;
+}
+
+.opacityHigh {
+  opacity: 1;
+}
+
+.opacityMedium {
+  opacity: 0.25;
+}
+
+.opacityLow {
+  opacity: 0.1;
+}
+
+.bgPurple.opacityLow:hover {
+  opacity: 0.25;
+}

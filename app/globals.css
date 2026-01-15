@@ -1,61 +1,92 @@
 :root {
-  --text-light: #000000;
-  --bg-light1: #ffffff;
-  --bg-light2: #f4f7fd;
-  --bg-light3: linear-gradient(
+  --black: #000000;
+  --white: #ffffff;
+  --light-grey: #f4f7fd;
+  --bg-light-gradient: linear-gradient(
     to bottom,
     rgb(233, 239, 250),
     rgba(233, 239, 250, 0.5)
   );
-  --lines-light: #e4ebfa;
 
-  --text-dark: #ffffff;
-  --bg-dark1: #20212c;
-  --bg-dark2: #2b2c37;
-  --bg-dark3: linear-gradient(
+  --lines-light: #e4ebfa;
+  --lines-dark: #3e3f4e;
+
+  --very-dark-grey: #20212c;
+  --dark-grey: #2b2c37;
+  --bg-dark-gradient: linear-gradient(
     to bottom,
     rgba(43, 44, 55, 0.5),
     rgb(43, 44, 55)
   );
-  --lines-dark: #3e3f4e;
 
   --main-purple: #635fc7;
+  --main-purple-10: rgba(99, 95, 199, 0.1);
+  --main-purple-25: rgba(99, 95, 199, 0.25);
   --purple-hover: #a8a4ff;
   --color-red: #ea5555;
   --red-hover: #ff9898;
   --medium-grey: #828fa3;
-  --line-light: rgba(130, 143, 163, 0.25);
+  --medium-grey-25: rgba(130, 143, 163, 0.25);
+
+  --dot1: #49c4e5;
+  --dot2: #8471f2;
+  --dot3: #67e2ae;
 
   --transition: all 0.2s ease;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --background: var(--bg-light1);
-    --background-secondary: var(--bg-light2);
-    --background-tertiary: var(--bg-light3);
-    --text-color1: var(--text-light);
+    --background: var(--white);
+    --background-secondary: var(--light-grey);
+    --background-tertiary: var(--bg-light-gradient);
+    --text-color1: var(--black);
     --text-color2: var(--medium-grey);
-    --text-color3: var(--text-dark);
-    --line: var(--line-light);
-    --btn-text: var(--bg-light1);
-    --btn-bg: var(--main-purple);
-    --btn-bg-medium: rgba(99, 95, 199, 0.25);
-    --btn-bg-light: rgba(99, 95, 199, 0.1);
+
+    --bg-sidebar-hover: var(--main-purple-10);
+
+    --line: var(--lines-light);
+    --btn-text-primary: var(--white);
+    --btn-bg-primary: var(--main-purple);
+    --btn-bg-primary-hover: var(--purple-hover);
+
+    --btn-text-seconadry: var(--main-purple);
+    --btn-bg-secondary: var(--main-purple-10);
+    --btn-bg-secondary-hover: var(--main-purple-25);
+
+    --btn-text-danger: var(--white);
+    --btn-bg-danger: var(--color-red);
+    --btn-bg-danger-hover: var(--red-hover);
+
+    --btn-bg-medium: var(--main-purple-25);
+    --border: 1.5px solid var(--medium-grey-25);
   }
 }
 
 body.light {
-  --background: var(--bg-light1);
-  --background-secondary: var(--bg-light2);
-  --background-tertiary: var(--bg-light3);
-  --text-color1: var(--text-light);
+  --background: var(--white);
+  --background-secondary: var(--light-grey);
+  --background-tertiary: var(--bg-light-gradient);
+  --text-color1: var(--black);
   --text-color2: var(--medium-grey);
-  --line: var(--line-light);
-  --btn-text: var(--bg-light1);
-  --btn-bg: var(--main-purple);
-  --btn-bg-medium: rgba(99, 95, 199, 0.25);
-  --btn-bg-light: rgba(99, 95, 199, 0.1);
+
+  --bg-sidebar-hover: var(--main-purple-10);
+
+  --line: var(--lines-light);
+  --btn-text-primary: var(--white);
+  --btn-bg-primary: var(--main-purple);
+  --btn-bg-primary-hover: var(--purple-hover);
+
+  --btn-text-seconadry: var(--main-purple);
+  --btn-bg-secondary: var(--main-purple-10);
+  --btn-bg-secondary-hover: var(--main-purple-25);
+  --btn-bg-danger: var(--color-red);
+  --btn-bg-medium: var(--main-purple-25);
+  --border: 1.5px solid var(--medium-grey-25);
+}
+
+body.dark {
+  --bg-sidebar-hover: var(--white);
 }
 
 *,
@@ -72,53 +103,145 @@ html {
 }
 
 body {
-  height: 100%;
+  /* height: 100%; */
   font-size: 1.6rem;
   background-color: var(--background-secondary);
   color: var(--text-color1);
+  overflow: hidden;
 }
 
-/* LAYOUT */
-.appLayout {
-  display: grid;
-  grid-template-columns: 30rem 1fr;
-  grid-template-rows: 9.7rem 1fr;
-  height: 100vh;
-}
-
-.sidebarColumn {
-  grid-column: 1 / 2;
-  grid-row: 1 / -1;
-  height: 100%;
-  border-right: 1px solid var(--line);
-
-  display: grid;
-  grid-template-rows: 9.7rem 1fr;
-}
-
-.main-content {
-  grid-column: 2 / 3;
-  grid-row: 2 / 3;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* BUTTON */
-.add-btn {
+/* MODAL */
+.modal {
+  width: 48rem;
+  margin: auto;
   border: none;
-  color: var(--btn-text);
-  background-color: var(--btn-bg);
-  font-family: inherit;
-  font-size: 1.5rem;
+  padding: 3.5rem 3rem;
+  border-radius: 0.8rem;
+  background-color: var(--background);
+}
+
+.modal::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  margin-bottom: 2rem;
+}
+
+.modalHeading {
+  font-size: 1.8rem;
+}
+
+.headingDanger {
+  color: var(--color-red);
+}
+
+.deleteText {
+  color: var(--text-color2);
+  font-size: 1.3rem;
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+
+/* FORM */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+.formControl {
+  display: flex;
+  flex-direction: column;
+}
+
+.formControl label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-color2);
+  margin-bottom: 0.8rem;
+}
+
+.formControl input {
+  height: 4rem;
+  font-size: 1.3rem;
   font-weight: 500;
-  padding: 1.5rem 3rem;
-  border-radius: 50px;
-  margin-right: 1.8rem;
+}
+
+.formControl input,
+.formControl textarea {
+  border-radius: 0.5rem;
+  border: var(--border);
+  color: var(--text-color1);
+  font-family: inherit;
+  font-size: 1.3rem;
+  padding: 0.6rem 1.5rem;
+  line-height: 1.9;
   cursor: pointer;
   transition: var(--transition);
 }
 
-.btn-inactive {
-  opacity: 0.25;
+.formControl input:hover,
+.formControl textarea:hover,
+.formControl input:focus,
+.formControl textarea:focus {
+  border-color: var(--main-purple);
+  outline: var(--main-purple);
+}
+
+.formControl input::placeholder,
+.formControl textarea::placeholder {
+  opacity: 0.5;
+}
+
+/* BUTTON */
+.btn {
+  padding: 0.8rem 3rem;
+  border: none;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.8;
+  background: transparent;
+  cursor: pointer;
+
+  transition: var(--transition);
+}
+
+.btnGroup {
+  width: 100%;
+  display: flex;
+  gap: 1.6rem;
+}
+
+.btnGroup .btn {
+  flex: 1;
+}
+
+.btnPrimary {
+  background-color: var(--btn-bg-primary);
+  color: var(--btn-text-primary);
+}
+
+.btnPrimary:hover {
+  background-color: var(--btn-bg-primary-hover);
+}
+
+.btnSecondary {
+  background-color: var(--btn-bg-secondary);
+  color: var(--btn-text-seconadry);
+}
+
+.btnSecondary:hover {
+  background-color: var(--btn-bg-secondary-hover);
+}
+
+.btnDanger {
+  background-color: var(--btn-bg-danger);
+  color: var(--btn-text-danger);
+}
+
+.btnDanger:hover {
+  background-color: var(--btn-bg-danger-hover);
 }

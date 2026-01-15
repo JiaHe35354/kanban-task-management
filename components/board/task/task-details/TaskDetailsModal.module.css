@@ -1,0 +1,111 @@
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+  margin-bottom: 2.6rem;
+}
+
+.taskTitle {
+  font-size: 1.8rem;
+}
+
+.kebabBtn {
+  border: none;
+  background: transparent;
+  padding: 1rem 0.8rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.description {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: var(--text-color2);
+  margin-bottom: 2.6rem;
+}
+
+.subtasks {
+  border: none;
+  /* display: flex;
+  flex-direction: column;
+  gap: 1.5rem; */
+}
+
+.subtaskTitle {
+  color: var(--text-color2);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.subtaskList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 2.6rem;
+}
+
+.subtaskItem {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-color1);
+  background-color: var(--background-secondary);
+  padding: 1.5rem 1.3rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+
+  display: grid;
+  grid-template-columns: 1em auto;
+  align-items: center;
+  gap: 2rem;
+}
+
+.subtaskItem:hover {
+  background-color: var(--main-purple-25);
+}
+
+.subtaskItem input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.6rem;
+  height: 1.6rem;
+  background-color: var(--background);
+  border: 1px solid var(--medium-grey-25);
+  border-radius: 0.2rem;
+  transition: var(--transition);
+
+  display: grid;
+  place-content: center;
+}
+
+.subtaskItem input[type="checkbox"]:checked {
+  background-color: var(--main-purple);
+}
+
+.subtaskItem input[type="checkbox"]::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  transform: scale(0);
+
+  transform-origin: center;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  background-color: var(--white);
+}
+
+.subtaskItem input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.statusLabel {
+  font-size: 1.2rem;
+  color: var(--text-color2);
+}

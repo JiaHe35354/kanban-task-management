@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import LightThemeIcon from "/assets/icon-light-theme.svg";
+import DarkThemeIcon from "/assets/icon-dark-theme.svg";
 
-import classes from "./theme-toggle.module.css";
+import classes from "./ThemeToggle.module.css";
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState("light");
@@ -15,17 +17,13 @@ export default function ThemeToggle() {
     >
       <label
         htmlFor="light"
-        className={`${classes.label} ${classes["label-light"]}`}
+        className={`${classes.label} ${classes.labelLight}`}
       >
-        <img
-          src="/assets/icon-light-theme.svg"
-          alt="Light theme icon"
-          className={classes["icon-light"]}
-        />
-        <span className={classes["visually-hidden"]}>Light theme</span>
+        <LightThemeIcon className={classes.icon} />
+        <span className={classes.visuallyHidden}>Light theme</span>
       </label>
 
-      <div className={classes["toggle-wrapper"]} data-theme={theme}>
+      <div className={classes.toggleWrapper} data-theme={theme}>
         <div className={classes.inputs}>
           <input
             type="radio"
@@ -46,16 +44,9 @@ export default function ThemeToggle() {
         <span aria-hidden="true" className={classes.button}></span>
       </div>
 
-      <label
-        htmlFor="dark"
-        className={`${classes.label} ${classes["label-dark"]}`}
-      >
-        <img
-          src="/assets/icon-dark-theme.svg"
-          alt="Dark theme icon"
-          className={classes["icon-dark"]}
-        />
-        <span className={classes["visually-hidden"]}>Dark theme</span>
+      <label htmlFor="dark" className={`${classes.label} ${classes.labelDark}`}>
+        <DarkThemeIcon className={classes.icon} />
+        <span className={classes.visuallyHidden}>Dark theme</span>
       </label>
     </fieldset>
   );

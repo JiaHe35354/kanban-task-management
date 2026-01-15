@@ -1,0 +1,35 @@
+.subtasksWrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subtaskRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  gap: 1.6rem;
+}
+
+.subtaskRow input {
+  flex: 1;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.subtaskRow .closeBtn {
+  flex-shrink: 0;
+  background-color: transparent;
+  border: none;
+  color: var(--medium-grey);
+  cursor: pointer;
+}
+
+.statusLabel {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--text-color2);
+  margin-bottom: 0.8rem;
+}

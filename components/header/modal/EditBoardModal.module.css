@@ -1,0 +1,26 @@
+.columnsWrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.columnRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  gap: 1.6rem;
+}
+
+.columnRow input {
+  flex: 1;
+}
+
+.columnRow .closeBtn {
+  flex-shrink: 0;
+  background-color: transparent;
+  border: none;
+  color: var(--medium-grey);
+  cursor: pointer;
+}
