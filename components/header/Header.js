@@ -8,17 +8,21 @@ import NewTaskModal from "./modal/NewTaskModal";
 import EditBoardModal from "./modal/EditBoardModal";
 import DeleteBoardModal from "./modal/DeleteBoardModal";
 import HeaderLogo from "./HeaderLogo";
+import AddTaskMobileIcon from "@/assets/icon-add-task-mobile.svg";
 import HeaderMenuButton from "./HeaderMenuButton";
+import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
 
 import classes from "./Header.module.css";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-export default function Header() {
+export default function Header({ onToggleSidebar }) {
   const newTaskModal = useRef();
   const editBoardModal = useRef();
   const deleteBoardModal = useRef();
 
   const activeBoard = useSelector(selectActiveBoard);
   const boardName = activeBoard.name;
+  const isMobile = useMediaQuery("(max-width: 46.25em");
 
   function handleOpenNewTask() {
     newTaskModal.current.open();
@@ -44,11 +48,21 @@ export default function Header() {
         <div className={classes.divider}></div>
 
         <div className={classes.mainHeader}>
-          <h1>{activeBoard.name}</h1>
+          <div className={classes.heading} onClick={onToggleSidebar}>
+            <h1>{activeBoard.name}</h1>
+            {isMobile && <ChevronDownIcon />}
+          </div>
+
           <div className={classes.btnGroup}>
-            <button className={classes.addBtn} onClick={handleOpenNewTask}>
-              + Add New Tasks
-            </button>
+            {isMobile ? (
+              <button className={classes.plusBtn}>
+                <AddTaskMobileIcon className={classes.plusIcon} />
+              </button>
+            ) : (
+              <button className={classes.addBtn} onClick={handleOpenNewTask}>
+                + Add New Tasks
+              </button>
+            )}
 
             <HeaderMenuButton
               onEditBoard={handleOpenEditBoard}

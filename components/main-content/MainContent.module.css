@@ -81,3 +81,37 @@
 .btnShow:hover {
   background-color: var(--purple-hover);
 }
+
+.mobileSideBar {
+  position: fixed;
+  top: 8.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26.4rem;
+
+  background-color: var(--background);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  z-index: 1000;
+}
+
+@media only screen and (max-width: 64em) {
+  .appLayout {
+    grid-template-rows: 8.1rem 1fr;
+  }
+
+  .sidebarOpen {
+    grid-template-columns: 26rem 1fr;
+  }
+
+  .sidebarBody {
+    width: 26rem;
+  }
+}
+
+@media only screen and (max-width: 46.25em) {
+  .appLayout {
+    grid-template-rows: 6.4rem 1fr;
+  }
+}

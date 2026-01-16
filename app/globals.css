@@ -87,6 +87,7 @@ body.light {
   --background-tertiary: var(--bg-light-gradient);
   --text-color1: var(--black);
   --text-color2: var(--medium-grey);
+  --label-color: var(--medium-grey);
 
   --bg-sidebar-hover: var(--main-purple-10);
 
@@ -104,7 +105,7 @@ body.light {
   --btn-bg-danger-hover: var(--red-hover);
 
   --btn-bg-medium: var(--main-purple-25);
-  --border: 1.5px solid var(--medium-grey-25);
+  --border: 1.6px solid var(--medium-grey-25);
 }
 
 *,
