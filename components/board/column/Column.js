@@ -3,6 +3,8 @@ import TaskList from "../task/TaskList";
 import classes from "./Column.module.css";
 
 export default function Column({ column }) {
+  const numOfTasks = column.tasks.length;
+
   return (
     <li className={classes.columnListItem}>
       <div className={classes.columnHeader}>
@@ -10,7 +12,9 @@ export default function Column({ column }) {
           className={classes.dot}
           style={{ backgroundColor: column.color }}
         />
-        <p className={classes.columnTitle}>{column.name}</p>
+        <p
+          className={classes.columnTitle}
+        >{`${column.name} (${numOfTasks})`}</p>
       </div>
 
       <TaskList tasks={column.tasks} />

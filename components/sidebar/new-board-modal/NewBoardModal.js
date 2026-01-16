@@ -60,7 +60,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
 
       <form className="form">
         <div className="formControl">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">Board Name</label>
           <input
             type="text"
             id="name"
@@ -70,7 +70,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
         </div>
 
         <div className="formControl">
-          <label htmlFor="columns">Columns</label>
+          <label htmlFor="columns">Board Columns</label>
 
           <div className={classes.columnsWrapper}>
             {columns.map((column) => (

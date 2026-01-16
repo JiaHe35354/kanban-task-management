@@ -18,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={plusJakartaSans.className}>
-      <body className="light">
+      <body className="dark">
         <Providers>
           <div id="modal"></div>
 

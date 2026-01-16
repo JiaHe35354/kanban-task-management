@@ -72,10 +72,10 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
 
           <div className={classes.columnsWrapper}>
             {activeBoard.columns.map((column) => (
-              <div key={column.id} className={classes.columnRow}>
+              <div key={column.name} className={classes.columnRow}>
                 <input
                   type="text"
-                  value={column.name}
+                  defaultValue={column.name}
                   onChange={(e) =>
                     handleUpdateColumn(column.id, e.target.value)
                   }

@@ -6,8 +6,10 @@
   margin-bottom: 2.6rem;
 }
 
-.taskTitle {
+.heading {
   font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-color1);
 }
 
 .kebabBtn {
@@ -27,15 +29,12 @@
 
 .subtasks {
   border: none;
-  /* display: flex;
-  flex-direction: column;
-  gap: 1.5rem; */
 }
 
 .subtaskTitle {
-  color: var(--text-color2);
+  color: var(--label-color);
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 500;
   margin-bottom: 1.5rem;
 }
 
@@ -49,12 +48,13 @@
 
 .subtaskItem {
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 500;
   color: var(--text-color1);
   background-color: var(--background-secondary);
   padding: 1.5rem 1.3rem;
   border-radius: 0.5rem;
   cursor: pointer;
+  transition: var(--transition);
 
   display: grid;
   grid-template-columns: 1em auto;
@@ -99,6 +99,11 @@
   transform: scale(1);
 }
 
+.subtaskItem input:checked + .subtaskLabel {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
 .status {
   display: flex;
   flex-direction: column;
@@ -107,5 +112,6 @@
 
 .statusLabel {
   font-size: 1.2rem;
-  color: var(--text-color2);
+  font-weight: 500;
+  color: var(--label-color);
 }

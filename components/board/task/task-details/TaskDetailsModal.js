@@ -47,7 +47,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
   return createPortal(
     <dialog ref={dialog} className="modal">
       <header className={classes.modalHeader}>
-        <h4 className={classes.taskTitle}>{task.title}</h4>
+        <h4 className={classes.heading}>{task.title}</h4>
 
         <MenuButton onEdit={onEdit} onDelete={onDelete} />
       </header>
@@ -61,7 +61,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
 
         <fieldset className={classes.subtasks}>
           <legend className={classes.subtaskTitle}>
-            Subtasks({`${completed} of ${total}`})
+            Subtasks ({`${completed} of ${total}`})
           </legend>
           <ul className={classes.subtaskList}>
             {task.subtasks.map((subtask) => (
@@ -72,7 +72,9 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
                   checked={subtask.isCompleted}
                   readOnly
                 />
-                <label htmlFor={subtask.id}>{subtask.title}</label>
+                <label htmlFor={subtask.id} className={classes.subtaskLabel}>
+                  {subtask.title}
+                </label>
               </li>
             ))}
           </ul>

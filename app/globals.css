@@ -13,10 +13,11 @@
 
   --very-dark-grey: #20212c;
   --dark-grey: #2b2c37;
+
   --bg-dark-gradient: linear-gradient(
     to bottom,
-    rgba(43, 44, 55, 0.5),
-    rgb(43, 44, 55)
+    rgba(43, 44, 55, 0.5) 0%,
+    rgba(43, 44, 55, 0.1) 100%
   );
 
   --main-purple: #635fc7;
@@ -35,6 +36,22 @@
   --transition: all 0.2s ease;
 }
 
+body.dark {
+  --background: var(--dark-grey);
+  --background-secondary: var(--very-dark-grey);
+  --background-tertiary: var(--bg-dark-gradient);
+  --text-color1: var(--white);
+  --text-color2: var(--medium-grey);
+  --label-color: var(--white);
+
+  --btn-bg-secondary: var(--white);
+  --btn-bg-secondary-hover: var(--white);
+
+  --line: var(--lines-dark);
+
+  --bg-sidebar-hover: var(--white);
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     --background: var(--white);
@@ -42,6 +59,7 @@
     --background-tertiary: var(--bg-light-gradient);
     --text-color1: var(--black);
     --text-color2: var(--medium-grey);
+    --label-color: var(--medium-grey);
 
     --bg-sidebar-hover: var(--main-purple-10);
 
@@ -59,7 +77,7 @@
     --btn-bg-danger-hover: var(--red-hover);
 
     --btn-bg-medium: var(--main-purple-25);
-    --border: 1.5px solid var(--medium-grey-25);
+    --border: 1.6px solid var(--medium-grey-25);
   }
 }
 
@@ -80,13 +98,13 @@ body.light {
   --btn-text-seconadry: var(--main-purple);
   --btn-bg-secondary: var(--main-purple-10);
   --btn-bg-secondary-hover: var(--main-purple-25);
+
+  --btn-text-danger: var(--white);
   --btn-bg-danger: var(--color-red);
+  --btn-bg-danger-hover: var(--red-hover);
+
   --btn-bg-medium: var(--main-purple-25);
   --border: 1.5px solid var(--medium-grey-25);
-}
-
-body.dark {
-  --bg-sidebar-hover: var(--white);
 }
 
 *,
@@ -130,6 +148,8 @@ body {
 
 .modalHeading {
   font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-color1);
 }
 
 .headingDanger {
@@ -157,8 +177,8 @@ body {
 
 .formControl label {
   font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--text-color2);
+  font-weight: 500;
+  color: var(--label-color);
   margin-bottom: 0.8rem;
 }
 
@@ -173,8 +193,10 @@ body {
   border-radius: 0.5rem;
   border: var(--border);
   color: var(--text-color1);
+  background-color: var(--background);
   font-family: inherit;
   font-size: 1.3rem;
+  font-weight: 400;
   padding: 0.6rem 1.5rem;
   line-height: 1.9;
   cursor: pointer;

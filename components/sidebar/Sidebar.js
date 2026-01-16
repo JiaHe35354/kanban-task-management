@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { boardActions } from "@/store/boardSlice";
 
 import NewBoardModal from "./new-board-modal/NewBoardModal";
-import ThemeToggle from "../theme-toggle/ThemeToggle";
+import ThemeToggle from "./theme-toggle/ThemeToggle";
 import BoardIcon from "@/assets/icon-board.svg";
 import HideSidebarIcon from "@/assets/icon-hide-sidebar.svg";
 

@@ -15,6 +15,7 @@
 
 .columnRow input {
   flex: 1;
+  /* font-weight: ; */
 }
 
 .columnRow .closeBtn {
