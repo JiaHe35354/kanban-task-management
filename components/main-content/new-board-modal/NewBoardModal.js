@@ -33,6 +33,12 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
     };
   });
 
+  function handleBackdropClick(e) {
+    if (e.target === dialog.current) {
+      dialog.current.close();
+    }
+  }
+
   function handleAddColumn() {
     setColumns((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
   }
@@ -53,9 +59,18 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal">
+    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
       <header className="modalHeader">
         <h4 className="modalHeading">Add New Board</h4>
+
+        <button
+          type="button"
+          className="modalClose"
+          onClick={() => dialog.current.close()}
+          aria-label="Close modal"
+        >
+          <CrossIcon />
+        </button>
       </header>
 
       <form className="form">

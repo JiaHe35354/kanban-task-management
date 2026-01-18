@@ -12,8 +12,10 @@ import { useSelector } from "react-redux";
 
 import { selectColumnsOfActiveBoard } from "@/store/boardSelector";
 import { getSubtaskStats } from "@/util/taskHelper";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import MenuButton from "./MenuButton";
 import StatusDropDown from "@/components/ui/StatusDropDown";
+import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 import classes from "./TaskDetailsModal.module.css";
@@ -26,6 +28,8 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
   const [mounted, setMounted] = useState(false);
   const dialog = useRef();
 
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -37,6 +41,12 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
     };
   });
 
+  function handleBackdropClick(e) {
+    if (e.target === dialog.current) {
+      dialog.current.close();
+    }
+  }
+
   if (!mounted) return null;
 
   const modalRoot = document.getElementById("modal");
@@ -45,11 +55,23 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
   const { total, completed } = getSubtaskStats(task.subtasks);
 
   return createPortal(
-    <dialog ref={dialog} className="modal">
+    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
+      {isMobile && (
+        <button
+          type="button"
+          className={classes.closeBtn}
+          onClick={() => dialog.current.close()}
+          aria-label="Close task details"
+        >
+          <CrossIcon />
+        </button>
+      )}
       <header className={classes.modalHeader}>
         <h4 className={classes.heading}>{task.title}</h4>
 
-        <MenuButton onEdit={onEdit} onDelete={onDelete} />
+        <div className={classes.headerActions}>
+          <MenuButton onEdit={onEdit} onDelete={onDelete} />
+        </div>
       </header>
 
       <section className={classes.modalContent}>

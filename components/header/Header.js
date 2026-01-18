@@ -22,7 +22,7 @@ export default function Header({ onToggleSidebar }) {
 
   const activeBoard = useSelector(selectActiveBoard);
   const boardName = activeBoard.name;
-  const isMobile = useMediaQuery("(max-width: 46.25em");
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
 
   function handleOpenNewTask() {
     newTaskModal.current.open();
@@ -55,7 +55,7 @@ export default function Header({ onToggleSidebar }) {
 
           <div className={classes.btnGroup}>
             {isMobile ? (
-              <button className={classes.plusBtn}>
+              <button className={classes.plusBtn} onClick={handleOpenNewTask}>
                 <AddTaskMobileIcon className={classes.plusIcon} />
               </button>
             ) : (

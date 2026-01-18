@@ -132,11 +132,13 @@ body {
 /* MODAL */
 .modal {
   width: 48rem;
+  max-width: 90%;
   margin: auto;
   border: none;
   padding: 3.5rem 3rem;
   border-radius: 0.8rem;
   background-color: var(--background);
+  position: relative;
 }
 
 .modal::backdrop {
@@ -145,11 +147,20 @@ body {
 
 .modalHeader {
   margin-bottom: 2rem;
+  position: relative;
+}
+
+.modalClose {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: none;
+  border: none;
 }
 
 .modalHeading {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-color1);
 }
 
@@ -165,10 +176,11 @@ body {
 }
 
 /* FORM */
-.form {
+.modal .form {
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
+  overflow-y: auto;
 }
 
 .formControl {
@@ -197,7 +209,7 @@ body {
   background-color: var(--background);
   font-family: inherit;
   font-size: 1.3rem;
-  font-weight: 400;
+  font-weight: 500;
   padding: 0.6rem 1.5rem;
   line-height: 1.9;
   cursor: pointer;
@@ -224,7 +236,7 @@ body {
   border-radius: 100px;
   font-family: inherit;
   font-size: 1.3rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.8;
   background: transparent;
   cursor: pointer;
@@ -267,4 +279,41 @@ body {
 
 .btnDanger:hover {
   background-color: var(--btn-bg-danger-hover);
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.fade-out {
+  animation: fadeOut 0.2s ease-out;
+}
+
+@media only screen and (max-width: 46.25em) {
+  .modal {
+    padding: 2rem 2.2rem;
+  }
+
+  .btnGroup {
+    flex-direction: column;
+  }
 }

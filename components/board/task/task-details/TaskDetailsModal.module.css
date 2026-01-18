@@ -1,8 +1,24 @@
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-color1);
+  background-color: var(--medium-grey-25);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .modalHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 2.5rem;
+  margin-top: 2rem;
   margin-bottom: 2.6rem;
 }
 
@@ -10,6 +26,12 @@
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--text-color1);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 }
 
 .kebabBtn {
@@ -114,4 +136,10 @@
   font-size: 1.2rem;
   font-weight: 500;
   color: var(--label-color);
+}
+
+@media only screen and (max-width: 46.25em) {
+  .modalHeader {
+    gap: 1rem;
+  }
 }

@@ -29,13 +29,19 @@ const DeleteBoardModal = forwardRef(function DeleteBoardModal(
     };
   });
 
+  function handleBackdropClick(e) {
+    if (e.target === dialog.current) {
+      dialog.current.close();
+    }
+  }
+
   if (!mounted) return null;
 
   const modalRoot = document.getElementById("modal");
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal">
+    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
       <header className="modalHeader">
         <h4 className="modalHeading headingDanger">Delete this board?</h4>
       </header>

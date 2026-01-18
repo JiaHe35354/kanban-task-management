@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import TaskDetailsModal from "./task-details/TaskDetailsModal";
 import EditTaskModal from "./edit-task/EditTaskModal";
-import DeleteTaskModal from "./task-details/DeleteTaskModal";
+import DeleteTaskModal from "./delete-task/DeleteTaskModal";
 import { getSubtaskStats } from "@/util/taskHelper";
 
 import classes from "./Task.module.css";

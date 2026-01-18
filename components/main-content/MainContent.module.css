@@ -54,10 +54,6 @@
   overflow: hidden;
 
   position: relative;
-  /*   
-  display: flex;
-  justify-content: center;
-  align-items: center; */
 }
 
 .btnShow {
@@ -82,7 +78,17 @@
   background-color: var(--purple-hover);
 }
 
-.mobileSideBar {
+.backdrop {
+  position: fixed;
+  top: 6.4rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+.mobileSidebar {
   position: fixed;
   top: 8.1rem;
   left: 50%;
@@ -113,5 +119,10 @@
 @media only screen and (max-width: 46.25em) {
   .appLayout {
     grid-template-rows: 6.4rem 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .mainContent {
+    grid-column: 1 / -1;
   }
 }

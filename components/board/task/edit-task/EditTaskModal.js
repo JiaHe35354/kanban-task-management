@@ -32,15 +32,30 @@ const EditTaskModal = forwardRef(function EditTaskModal({ task }, ref) {
     };
   });
 
+  function handleBackdropClick(e) {
+    if (e.target === dialog.current) {
+      dialog.current.close();
+    }
+  }
+
   if (!mounted) return null;
 
   const modalRoot = document.getElementById("modal");
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal">
+    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
       <header className="modalHeader">
         <h4 className="modalHeading">Edit Task</h4>
+
+        <button
+          type="button"
+          className="modalClose"
+          onClick={() => dialog.current.close()}
+          aria-label="Close modal"
+        >
+          <CrossIcon />
+        </button>
       </header>
 
       <form className="form">
@@ -55,7 +70,7 @@ const EditTaskModal = forwardRef(function EditTaskModal({ task }, ref) {
             id="description"
             name="description"
             rows="4"
-            placeholder={task.description}
+            value={task.description}
           />
         </div>
 

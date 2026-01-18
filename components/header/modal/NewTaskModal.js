@@ -44,6 +44,12 @@ const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
     };
   });
 
+  function handleBackdropClick(e) {
+    if (e.target === dialog.current) {
+      dialog.current.close();
+    }
+  }
+
   function handleAddSubtask() {
     setSubtasks((prev) => [...prev, { id: crypto.randomUUID(), title: "" }]);
   }
@@ -66,9 +72,17 @@ const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal">
+    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
       <header className="modalHeader">
         <h4 className="modalHeading">Add New Task</h4>
+        <button
+          type="button"
+          className="modalClose"
+          onClick={() => dialog.current.close()}
+          aria-label="Close modal"
+        >
+          <CrossIcon />
+        </button>
       </header>
 
       <form className="form">
