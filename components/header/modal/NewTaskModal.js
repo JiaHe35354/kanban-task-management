@@ -45,8 +45,8 @@ const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
   });
 
   function handleBackdropClick(e) {
-    if (e.target === dialog.current) {
-      dialog.current.close();
+    if (e.target === e.currentTarget) {
+      e.currentTarget.close();
     }
   }
 

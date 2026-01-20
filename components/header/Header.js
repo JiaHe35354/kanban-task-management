@@ -11,11 +11,12 @@ import HeaderLogo from "./HeaderLogo";
 import AddTaskMobileIcon from "@/assets/icon-add-task-mobile.svg";
 import HeaderMenuButton from "./HeaderMenuButton";
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
+import ChevronUpIcon from "@/assets/icon-chevron-up.svg";
 
 import classes from "./Header.module.css";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-export default function Header({ onToggleSidebar }) {
+export default function Header({ onToggleSidebar, isOpen }) {
   const newTaskModal = useRef();
   const editBoardModal = useRef();
   const deleteBoardModal = useRef();
@@ -39,7 +40,7 @@ export default function Header({ onToggleSidebar }) {
   return (
     <>
       <NewTaskModal ref={newTaskModal} />
-      <EditBoardModal ref={editBoardModal} />
+      <EditBoardModal ref={editBoardModal} activeBoard={activeBoard} />
       <DeleteBoardModal ref={deleteBoardModal} boardName={boardName} />
 
       <header className={classes.header}>
@@ -48,10 +49,16 @@ export default function Header({ onToggleSidebar }) {
         <div className={classes.divider}></div>
 
         <div className={classes.mainHeader}>
-          <div className={classes.heading} onClick={onToggleSidebar}>
+          <button className={classes.heading} onClick={onToggleSidebar}>
             <h1>{activeBoard.name}</h1>
-            {isMobile && <ChevronDownIcon />}
-          </div>
+            {isMobile && (
+              <ChevronDownIcon
+                className={`${classes.chevronIcon} ${
+                  isOpen ? classes.open : ""
+                }`}
+              />
+            )}
+          </button>
 
           <div className={classes.btnGroup}>
             {isMobile ? (

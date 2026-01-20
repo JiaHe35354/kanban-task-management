@@ -19,13 +19,10 @@ const boardSlice = createSlice({
 
       const board = state.boards.find((b) => b.id === boardId);
 
-      const columnIndex = board.columns.length;
-
       board.columns.push({
         id: crypto.randomUUID(),
         name: columnName,
-        color: COLUMN_COLORS[columnIndex % COLUMN_COLORS.length],
-        tasks: [],
+        color: COLUMN_COLORS[board.columns.length % COLUMN_COLORS.length],
       });
     },
   },

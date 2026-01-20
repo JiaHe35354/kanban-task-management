@@ -5,21 +5,20 @@ import {
   useRef,
   useState,
 } from "react";
-import { useSelector } from "react-redux";
 import { createPortal } from "react-dom";
 
-import { selectColumnsOfActiveBoard } from "@/store/boardSelector";
 import StatusDropDown from "@/components/ui/StatusDropDown";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 import classes from "./EditTaskModal.module.css";
 
-const EditTaskModal = forwardRef(function EditTaskModal({ task }, ref) {
+const EditTaskModal = forwardRef(function EditTaskModal(
+  { task, columns, currentColumn },
+  ref
+) {
   const [mounted, setMounted] = useState(false);
   const dialog = useRef();
-
-  const columns = useSelector(selectColumnsOfActiveBoard);
 
   useEffect(() => {
     setMounted(true);
@@ -103,7 +102,7 @@ const EditTaskModal = forwardRef(function EditTaskModal({ task }, ref) {
         <div className="formControl">
           <p className={classes.statusLabel}>Status</p>
 
-          <StatusDropDown value={task.status} options={columns} />
+          <StatusDropDown value={currentColumn?.name} options={columns} />
         </div>
 
         <button type="button" className="btn btnPrimary">

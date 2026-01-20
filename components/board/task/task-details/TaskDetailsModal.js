@@ -8,10 +8,8 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useSelector } from "react-redux";
 
-import { selectColumnsOfActiveBoard } from "@/store/boardSelector";
-import { getSubtaskStats } from "@/util/taskHelper";
+import { getSubtaskStats } from "@/utils/taskHelper";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import MenuButton from "./MenuButton";
 import StatusDropDown from "@/components/ui/StatusDropDown";
@@ -21,10 +19,9 @@ import "@/app/globals.css";
 import classes from "./TaskDetailsModal.module.css";
 
 const TaskDetailsModal = forwardRef(function TaskDetailsModal(
-  { task, onEdit, onDelete },
+  { task, columns, currentColumn, onEdit, onDelete },
   ref
 ) {
-  const columns = useSelector(selectColumnsOfActiveBoard);
   const [mounted, setMounted] = useState(false);
   const dialog = useRef();
 
@@ -56,16 +53,6 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
 
   return createPortal(
     <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
-      {isMobile && (
-        <button
-          type="button"
-          className={classes.closeBtn}
-          onClick={() => dialog.current.close()}
-          aria-label="Close task details"
-        >
-          <CrossIcon />
-        </button>
-      )}
       <header className={classes.modalHeader}>
         <h4 className={classes.heading}>{task.title}</h4>
 
@@ -87,7 +74,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
           </legend>
           <ul className={classes.subtaskList}>
             {task.subtasks.map((subtask) => (
-              <li key={subtask.title} className={classes.subtaskItem}>
+              <li key={subtask.id} className={classes.subtaskItem}>
                 <input
                   type="checkbox"
                   id={subtask.id}
@@ -105,15 +92,22 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
         <div className={classes.status}>
           <h5 className={classes.statusLabel}>Current Status</h5>
 
-          <StatusDropDown value={task.status} options={columns} />
+          <StatusDropDown value={currentColumn?.name} options={columns} />
         </div>
       </section>
 
-      {/* <form method="dialog">
-        <button aria-label="Close task details" className="sr-only">
-          Close
-        </button>
-      </form> */}
+      {isMobile && (
+        <form method="dialog">
+          <button
+            className={`${classes.closeModalBtn} ${
+              !isMobile ? "visuallyHidden" : ""
+            }`}
+            aria-label="Close task details"
+          >
+            <CrossIcon />
+          </button>
+        </form>
+      )}
     </dialog>,
     modalRoot
   );

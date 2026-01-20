@@ -27,6 +27,10 @@
 }
 
 .heading {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-weight: inherit;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -35,6 +39,14 @@
 .heading h1 {
   font-size: 2.4rem;
   flex-shrink: 0;
+}
+
+.chevronIcon {
+  transition: var(--transition);
+}
+
+.open {
+  transform: rotate(180deg);
 }
 
 .btnGroup {

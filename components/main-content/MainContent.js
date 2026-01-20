@@ -48,6 +48,7 @@ export default function MainContent({ children }) {
         }`}
       >
         <Header
+          isOpen={isMobileSidebarOpen}
           onToggleSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
         />
 

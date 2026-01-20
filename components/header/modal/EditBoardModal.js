@@ -13,12 +13,12 @@ import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 import classes from "./EditBoardModal.module.css";
-import { useSelector } from "react-redux";
-import { selectActiveBoard } from "@/store/boardSelector";
 
-const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
+const EditBoardModal = forwardRef(function EditBoardModal(
+  { activeBoard },
+  ref
+) {
   const dialog = useRef();
-  const activeBoard = useSelector(selectActiveBoard);
 
   const [mounted, setMounted] = useState(false);
   const [columns, setColumns] = useState([

@@ -1,9 +1,15 @@
+import { useSelector } from "react-redux";
 import TaskList from "../task/TaskList";
 
 import classes from "./Column.module.css";
+import { selectTasksOfActiveBoard } from "@/store/boardSelector";
 
 export default function Column({ column }) {
-  const numOfTasks = column.tasks.length;
+  const tasks = useSelector(selectTasksOfActiveBoard);
+
+  const columnTasks = tasks.filter((task) => task.columnId === column.id);
+
+  const numOfTasks = columnTasks.length;
 
   return (
     <li className={classes.columnListItem}>
@@ -17,7 +23,7 @@ export default function Column({ column }) {
         >{`${column.name} (${numOfTasks})`}</p>
       </div>
 
-      <TaskList tasks={column.tasks} />
+      <TaskList tasks={columnTasks} />
     </li>
   );
 }
