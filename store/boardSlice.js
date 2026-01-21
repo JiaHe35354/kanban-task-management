@@ -1,6 +1,6 @@
 const { createSlice } = require("@reduxjs/toolkit");
 
-import initialData from "@/data/data.json";
+import initialData from "@/data/data.json" assert { type: "json" };
 import { COLUMN_COLORS } from "@/constants/columnColors";
 
 const boardSlice = createSlice({
