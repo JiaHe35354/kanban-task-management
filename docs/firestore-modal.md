@@ -4,14 +4,14 @@
 
 - id (uid from Firebase Auth)
 - email
-- createAt
+- createdAt
 
 ## boards
 
 - id
 - name
 - userId
-- createAt
+- createdAt
 
 ## columns
 

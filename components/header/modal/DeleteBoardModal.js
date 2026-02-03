@@ -1,19 +1,19 @@
 import {
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { BoardContext } from "@/app/context/BoardContext";
 
 import "@/app/globals.css";
 import classes from "./DeleteBoardModal.module.css";
 
-const DeleteBoardModal = forwardRef(function DeleteBoardModal(
-  { boardName },
-  ref
-) {
+const DeleteBoardModal = forwardRef(function DeleteBoardModal({}, ref) {
+  const { deleteBoard, activeBoard } = useContext(BoardContext);
   const dialog = useRef();
 
   const [mounted, setMounted] = useState(false);
@@ -35,6 +35,15 @@ const DeleteBoardModal = forwardRef(function DeleteBoardModal(
     }
   }
 
+  function handleDeleteBoard(boardId) {
+    deleteBoard(boardId);
+    dialog.current.close();
+  }
+
+  function handleCancel() {
+    dialog.current.close();
+  }
+
   if (!mounted) return null;
 
   const modalRoot = document.getElementById("modal");
@@ -48,13 +57,20 @@ const DeleteBoardModal = forwardRef(function DeleteBoardModal(
 
       <section>
         <p className="deleteText">
-          {`Are you sure you want to delete the "${boardName}" board? This
+          {`Are you sure you want to delete the "${activeBoard?.name}" board? This
           action will remove all columns and tasks and cannot be reversed.`}
         </p>
 
         <div className="btnGroup">
-          <button className="btn btnDanger">Delete</button>
-          <button className="btn btnSecondary">Cancel</button>
+          <button
+            className="btn btnDanger"
+            onClick={() => handleDeleteBoard(activeBoard.id)}
+          >
+            Delete
+          </button>
+          <button className="btn btnSecondary" onClick={handleCancel}>
+            Cancel
+          </button>
         </div>
       </section>
     </dialog>,

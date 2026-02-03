@@ -1,15 +1,12 @@
-import { useSelector } from "react-redux";
+import { useContext } from "react";
+
+import { BoardContext } from "@/app/context/BoardContext";
 import TaskList from "../task/TaskList";
 
 import classes from "./Column.module.css";
-import { selectTasksOfActiveBoard } from "@/store/boardSelector";
 
 export default function Column({ column }) {
-  const tasks = useSelector(selectTasksOfActiveBoard);
-
-  const columnTasks = tasks.filter((task) => task.columnId === column.id);
-
-  const numOfTasks = columnTasks.length;
+  const { tasks } = useContext(BoardContext);
 
   return (
     <li className={classes.columnListItem}>
@@ -20,10 +17,10 @@ export default function Column({ column }) {
         />
         <p
           className={classes.columnTitle}
-        >{`${column.name} (${numOfTasks})`}</p>
+        >{`${column.name} (${tasks.length})`}</p>
       </div>
 
-      <TaskList tasks={columnTasks} />
+      <TaskList tasks={tasks} />
     </li>
   );
 }

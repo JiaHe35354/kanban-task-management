@@ -1,8 +1,8 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
-import Providers from "./providers";
 import MainContent from "@/components/main-content/MainContent";
 
 import "./globals.css";
+import { BoardProvider } from "./context/BoardContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -19,11 +19,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={plusJakartaSans.className}>
       <body className="light">
-        <Providers>
-          <div id="modal"></div>
+        <div id="modal"></div>
 
+        <BoardProvider>
           <MainContent>{children}</MainContent>
-        </Providers>
+        </BoardProvider>
       </body>
     </html>
   );

@@ -1,28 +1,26 @@
 "use client";
 
-import { useRef } from "react";
-import { useSelector } from "react-redux";
+import { useContext, useRef } from "react";
 
-import { selectActiveBoard } from "@/store/boardSelector";
 import NewTaskModal from "./modal/NewTaskModal";
 import EditBoardModal from "./modal/EditBoardModal";
 import DeleteBoardModal from "./modal/DeleteBoardModal";
+import { BoardContext } from "@/app/context/BoardContext";
 import HeaderLogo from "./HeaderLogo";
 import AddTaskMobileIcon from "@/assets/icon-add-task-mobile.svg";
 import HeaderMenuButton from "./HeaderMenuButton";
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
-import ChevronUpIcon from "@/assets/icon-chevron-up.svg";
 
 import classes from "./Header.module.css";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export default function Header({ onToggleSidebar, isOpen }) {
+  const { activeBoard } = useContext(BoardContext);
+
   const newTaskModal = useRef();
   const editBoardModal = useRef();
   const deleteBoardModal = useRef();
 
-  const activeBoard = useSelector(selectActiveBoard);
-  const boardName = activeBoard.name;
   const isMobile = useMediaQuery("(max-width: 46.25em)");
 
   function handleOpenNewTask() {
@@ -40,8 +38,8 @@ export default function Header({ onToggleSidebar, isOpen }) {
   return (
     <>
       <NewTaskModal ref={newTaskModal} />
-      <EditBoardModal ref={editBoardModal} activeBoard={activeBoard} />
-      <DeleteBoardModal ref={deleteBoardModal} boardName={boardName} />
+      <EditBoardModal ref={editBoardModal} />
+      <DeleteBoardModal ref={deleteBoardModal} />
 
       <header className={classes.header}>
         <HeaderLogo />
@@ -50,7 +48,7 @@ export default function Header({ onToggleSidebar, isOpen }) {
 
         <div className={classes.mainHeader}>
           <button className={classes.heading} onClick={onToggleSidebar}>
-            <h1>{activeBoard.name}</h1>
+            <h1>{activeBoard ? activeBoard.name : "No board found"}</h1>
             {isMobile && (
               <ChevronDownIcon
                 className={`${classes.chevronIcon} ${
@@ -72,8 +70,8 @@ export default function Header({ onToggleSidebar, isOpen }) {
             )}
 
             <HeaderMenuButton
-              onEditBoard={handleOpenEditBoard}
-              onDeleteBoard={handleOpenDeleteBoard}
+              onOpenDelete={handleOpenDeleteBoard}
+              onOpenEdit={handleOpenEditBoard}
             />
           </div>
         </div>

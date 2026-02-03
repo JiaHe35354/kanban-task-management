@@ -1,37 +1,35 @@
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { boardActions } from "@/store/boardSlice";
+import { useContext } from "react";
 
+import { BoardContext } from "@/app/context/BoardContext";
 import ThemeToggle from "./theme-toggle/ThemeToggle";
 import BoardIcon from "@/assets/icon-board.svg";
 import HideSidebarIcon from "@/assets/icon-hide-sidebar.svg";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 import classes from "./Sidebar.module.css";
 
-export default function Sidebar({ onHide, onCreateBoard, isMobile }) {
-  const boards = useSelector((state) => state.board.boards);
-  const activeBoardIndex = useSelector((state) => state.board.activeBoardIndex);
-  const dispatch = useDispatch();
-
-  function handleActiveBoard(index) {
-    dispatch(boardActions.setActiveBoard(index));
-  }
+export default function Sidebar({
+  onSelectBoard,
+  onHide,
+  onOpenModal,
+  isMobile,
+}) {
+  const { boards, activeBoardId } = useContext(BoardContext);
 
   return (
     <nav className={classes.navbar}>
       <div className={classes.boardsBtns}>
-        <h2 className={classes.navTitle}>All boards (3)</h2>
+        <h2 className={classes.navTitle}>All boards ({boards.length})</h2>
 
         <ul className={classes.list}>
-          {boards.map((board, index) => (
+          {boards.map((board) => (
             <li
-              key={board.name}
-              onClick={() => handleActiveBoard(index)}
+              key={board.id}
               className={`${classes.listItem} ${
-                index === activeBoardIndex ? classes.active : ""
+                board.id === activeBoardId ? classes.active : ""
               }`}
+              onClick={() => onSelectBoard(board.id)}
             >
               <BoardIcon className={classes.iconBoard} />
               {board.name}
@@ -39,8 +37,8 @@ export default function Sidebar({ onHide, onCreateBoard, isMobile }) {
           ))}
         </ul>
 
-        <button className={classes.createBtn} onClick={onCreateBoard}>
-          <BoardIcon className={classes.iconBoard} />+ Create New Board
+        <button className={classes.createBtn} onClick={onOpenModal}>
+          <BoardIcon className={classes.iconBoard} /> + Create New Board
         </button>
       </div>
 

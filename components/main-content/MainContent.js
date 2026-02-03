@@ -1,8 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
-
+import { useContext, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { createBoard, getBoardsByUser } from "@/lib/firestore/boards";
+import { createColumn } from "@/lib/firestore/columns";
+
+import { BoardContext } from "@/app/context/BoardContext";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Header from "@/components/header/Header";
 import ShowSidebarIcon from "@/assets/icon-show-sidebar.svg";
@@ -11,12 +14,33 @@ import NewBoardModal from "./new-board-modal/NewBoardModal";
 import classes from "./MainContent.module.css";
 
 export default function MainContent({ children }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { selectBoard, cerateNewBoard } = useContext(BoardContext);
+
   const modal = useRef();
 
   // 740px:
   const isMobile = useMediaQuery("(max-width:46.25em)");
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // async function handleCreateTask({ title, description, status, subtasks }) {
+  //   const column = columns.find((c) => c.name === status);
+  //   if (!column) return;
+
+  //   const order = tasks.filter((t) => t.columnId === column.id).length;
+
+  //   // 🔹 optimistic UI later
+  //   await createTask(activeBoardId, column.id, title, description, order);
+
+  //   // then create subtasks
+  // }
+
+  function handleSelectBoard(boardId) {
+    selectBoard(boardId);
+
+    if (isMobile) setIsMobileSidebarOpen(false);
+  }
 
   function handleOpenModal() {
     if (isMobile) setIsMobileSidebarOpen(false);
@@ -41,7 +65,8 @@ export default function MainContent({ children }) {
 
   return (
     <>
-      <NewBoardModal ref={modal} />
+      <NewBoardModal ref={modal} onCreateBoard={cerateNewBoard} />
+
       <div
         className={`${classes.appLayout} ${
           isSidebarOpen ? classes.sidebarOpen : classes.sidebarClosed
@@ -60,8 +85,9 @@ export default function MainContent({ children }) {
               }`}
             >
               <Sidebar
+                onSelectBoard={handleSelectBoard}
                 onHide={handleHideSidebar}
-                onCreateBoard={handleOpenModal}
+                onOpenModal={handleOpenModal}
                 isMobile={isMobile}
               />
             </div>
@@ -77,7 +103,11 @@ export default function MainContent({ children }) {
               onClick={handleHideMobileSidebar}
             />
             <div className={`${classes.mobileSidebar} fade-in`}>
-              <Sidebar onCreateBoard={handleOpenModal} isMobile={isMobile} />
+              <Sidebar
+                onSelectBoard={handleSelectBoard}
+                onOpenModal={handleOpenModal}
+                isMobile={isMobile}
+              />
             </div>
           </>
         )}

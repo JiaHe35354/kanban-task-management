@@ -79,7 +79,6 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
                   type="checkbox"
                   id={subtask.id}
                   checked={subtask.isCompleted}
-                  readOnly
                 />
                 <label htmlFor={subtask.id} className={classes.subtaskLabel}>
                   {subtask.title}

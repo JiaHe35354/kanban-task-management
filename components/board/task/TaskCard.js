@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import { useSelector } from "react-redux";
+import { useContext, useRef } from "react";
 
+import { BoardContext } from "@/app/context/BoardContext";
 import TaskDetailsModal from "./task-details/TaskDetailsModal";
 import EditTaskModal from "./edit-task/EditTaskModal";
 import DeleteTaskModal from "./delete-task/DeleteTaskModal";
@@ -10,11 +10,12 @@ import { selectColumnsOfActiveBoard } from "@/store/boardSelector";
 import classes from "./Task.module.css";
 
 export default function TaskCard({ task }) {
+  const { columns } = useContext(BoardContext);
+
   const detailsModalRef = useRef();
   const editModalRef = useRef();
   const deleteModalRef = useRef();
 
-  const columns = useSelector(selectColumnsOfActiveBoard);
   const currentColumn = columns.find((column) => column.id === task.columnId);
 
   function handleOpenDetails() {

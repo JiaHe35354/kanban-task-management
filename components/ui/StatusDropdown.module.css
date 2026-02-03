@@ -35,9 +35,9 @@
   font-size: 1.3rem;
   font-weight: 500;
   padding: 1.8rem 1.5rem;
-  z-index: 1;
-  cursor: pointer;
   box-shadow: 0 -1px 5px rgba(130, 143, 163, 0.2);
+  z-index: 1000;
+  pointer-events: auto;
 
   display: flex;
   flex-direction: column;
@@ -45,6 +45,7 @@
 }
 
 .statusItem {
+  cursor: pointer;
   transition: var(--transition);
 }
 

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { BoardContext } from "@/app/context/BoardContext";
 import EditBoardModal from "./modal/EditBoardModal";
 import EllipsisIcon from "@/assets/icon-vertical-ellipsis.svg";
 
 import classes from "./HeaderMenuButton.module.css";
 
-export default function HeaderMenuButton({ onEditBoard, onDeleteBoard }) {
+export default function HeaderMenuButton({ onOpenEdit, onOpenDelete }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const buttonRef = useRef(null);
@@ -48,12 +49,12 @@ export default function HeaderMenuButton({ onEditBoard, onDeleteBoard }) {
         id="board-options-menu"
         className={`${classes.dropdownMenu} ${isMenuOpen ? classes.open : ""} `}
       >
-        <li className={classes.menuItem} onClick={onEditBoard}>
+        <li className={classes.menuItem} onClick={onOpenEdit}>
           Edit Board
         </li>
         <li
           className={`${classes.menuItem} ${classes.danger}`}
-          onClick={onDeleteBoard}
+          onClick={onOpenDelete}
         >
           Delete Board
         </li>

@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,25 +10,33 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { BoardContext } from "@/app/context/BoardContext";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 import classes from "./EditBoardModal.module.css";
 
-const EditBoardModal = forwardRef(function EditBoardModal(
-  { activeBoard },
-  ref
-) {
-  const dialog = useRef();
-
+const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
+  const [boardName, setBoardName] = useState("");
+  const [cols, setCols] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const [columns, setColumns] = useState([
-    { id: crypto.randomUUID(), name: "" },
-  ]);
+
+  const { activeBoard, columns, editBoard } = useContext(BoardContext);
+
+  const dialog = useRef();
+  const originalColumnsRef = useRef([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!activeBoard) return;
+
+    setBoardName(activeBoard.name);
+    setCols(columns);
+    originalColumnsRef.current = columns;
+  }, [activeBoard, columns]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -36,24 +45,46 @@ const EditBoardModal = forwardRef(function EditBoardModal(
     };
   });
 
+  function resetForm() {
+    if (!activeBoard) return;
+
+    setBoardName(activeBoard.name);
+    setCols(originalColumnsRef.current);
+  }
+
   function handleBackdropClick(e) {
     if (e.target === dialog.current) {
+      resetForm();
       dialog.current.close();
     }
   }
 
   function handleAddColumn() {
-    setColumns((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
+    setCols((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
   }
 
   function handleUpdateColumn(id, value) {
-    setColumns((prev) =>
+    setCols((prev) =>
       prev.map((col) => (col.id === id ? { ...col, name: value } : col))
     );
   }
 
   function handleRemoveColumn(id) {
-    setColumns((prev) => prev.filter((col) => col.id !== id));
+    setCols((prev) => prev.filter((col) => col.id !== id));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!activeBoard) return;
+
+    editBoard({
+      boardId: activeBoard.id,
+      name: boardName,
+      columns: cols,
+    });
+
+    dialog.current.close();
   }
 
   if (!mounted) return null;
@@ -68,36 +99,44 @@ const EditBoardModal = forwardRef(function EditBoardModal(
         <button
           type="button"
           className="modalClose"
-          onClick={() => dialog.current.close()}
+          onClick={() => {
+            resetForm();
+            dialog.current.close();
+          }}
           aria-label="Close modal"
         >
           <CrossIcon />
         </button>
       </header>
 
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
           <label htmlFor="name">Board Name</label>
-          <input type="text" id="name" name="name" value={activeBoard.name} />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={boardName}
+            onChange={(e) => setBoardName(e.target.value)}
+          />
         </div>
 
         <div className="formControl">
           <label htmlFor="columns">Board Columns</label>
 
           <div className={classes.columnsWrapper}>
-            {activeBoard.columns.map((column) => (
-              <div key={column.name} className={classes.columnRow}>
+            {cols.map((col) => (
+              <div key={col.id} className={classes.columnRow}>
                 <input
                   type="text"
-                  defaultValue={column.name}
-                  onChange={(e) =>
-                    handleUpdateColumn(column.id, e.target.value)
-                  }
+                  value={col.name}
+                  onChange={(e) => handleUpdateColumn(col.id, e.target.value)}
                 />
                 <button
                   type="button"
                   className={classes.closeBtn}
-                  onClick={() => handleRemoveColumn(column.id)}
+                  disabled={cols.length === 1}
+                  onClick={() => handleRemoveColumn(col.id)}
                 >
                   <CrossIcon />
                 </button>
@@ -105,7 +144,7 @@ const EditBoardModal = forwardRef(function EditBoardModal(
             ))}
           </div>
 
-          {columns.length <= 5 && (
+          {cols.length <= 5 && (
             <button
               type="button"
               className="btn btnSecondary"
@@ -116,9 +155,7 @@ const EditBoardModal = forwardRef(function EditBoardModal(
           )}
         </div>
 
-        <button type="button" className="btn btnPrimary">
-          Save Changes
-        </button>
+        <button className="btn btnPrimary">Save Changes</button>
       </form>
     </dialog>,
     modalRoot

@@ -1,9 +1,9 @@
-const { configureStore } = require("@reduxjs/toolkit");
+// const { configureStore } = require("@reduxjs/toolkit");
 
-import boardReducer from "./boardSlice.js";
+// import boardReducer from "./boardSlice.js";
 
-const store = configureStore({
-  reducer: { board: boardReducer },
-});
+// const store = configureStore({
+//   reducer: { board: boardReducer },
+// });
 
-export default store;
+// export default store;

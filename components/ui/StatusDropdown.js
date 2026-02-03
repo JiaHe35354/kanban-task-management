@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
 import classes from "./StatusDropdown.module.css";
@@ -7,6 +7,21 @@ export default function StatusDropDown({ value, options, onChange }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState(null);
   const buttonRef = useRef();
+
+  // DOESN'T WORK
+  // useEffect(() => {
+  //   function handleClickOutside(e) {
+  //     if (!buttonRef.current?.contains(e.target)) {
+  //       setMenuOpen(false);
+  //     }
+  //   }
+
+  //   if (menuOpen) {
+  //     window.addEventListener("click", handleClickOutside);
+  //   }
+
+  //   return () => window.removeEventListener("click", handleClickOutside);
+  // }, [menuOpen]);
 
   function toggleMenu() {
     const rect = buttonRef.current.getBoundingClientRect();
@@ -21,7 +36,8 @@ export default function StatusDropDown({ value, options, onChange }) {
     setMenuOpen((prev) => !prev);
   }
 
-  function handleSelect(option) {
+  function handleSelect(option, e) {
+    e.stopPropagation();
     onChange(option.name);
     setMenuOpen(false);
   }
@@ -50,7 +66,11 @@ export default function StatusDropDown({ value, options, onChange }) {
           }}
         >
           {options.map((option) => (
-            <li key={option.name} className={classes.statusItem}>
+            <li
+              key={option.name}
+              className={classes.statusItem}
+              onClick={(e) => handleSelect(option, e)}
+            >
               {option.name}
             </li>
           ))}
