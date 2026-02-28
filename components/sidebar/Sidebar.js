@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 
-import { BoardContext } from "@/app/context/BoardContext";
+import { BoardStateContext } from "@/context/BoardContext";
 import ThemeToggle from "./theme-toggle/ThemeToggle";
 import BoardIcon from "@/assets/icon-board.svg";
 import HideSidebarIcon from "@/assets/icon-hide-sidebar.svg";
@@ -15,7 +15,7 @@ export default function Sidebar({
   onOpenModal,
   isMobile,
 }) {
-  const { boards, activeBoardId } = useContext(BoardContext);
+  const { boards, activeBoardId } = useContext(BoardStateContext);
 
   return (
     <nav className={classes.navbar}>

@@ -1,8 +1,8 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
 import MainContent from "@/components/main-content/MainContent";
+import { BoardProvider } from "@/context/BoardContext";
 
 import "./globals.css";
-import { BoardProvider } from "./context/BoardContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],

@@ -7,13 +7,13 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { BoardContext } from "@/app/context/BoardContext";
+import { BoardActionsContext } from "@/context/BoardContext";
 
 import "@/app/globals.css";
 import classes from "./DeleteBoardModal.module.css";
 
 const DeleteBoardModal = forwardRef(function DeleteBoardModal({}, ref) {
-  const { deleteBoard, activeBoard } = useContext(BoardContext);
+  const { deleteBoard, activeBoard } = useContext(BoardActionsContext);
   const dialog = useRef();
 
   const [mounted, setMounted] = useState(false);
@@ -74,7 +74,7 @@ const DeleteBoardModal = forwardRef(function DeleteBoardModal({}, ref) {
         </div>
       </section>
     </dialog>,
-    modalRoot
+    modalRoot,
   );
 });
 

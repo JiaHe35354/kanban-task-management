@@ -1,22 +1,41 @@
-import { useContext } from "react";
+import { useContext, useRef } from "react";
 
-import { BoardContext } from "@/app/context/BoardContext.js";
+import { BoardStateContext } from "@/context/BoardContext.js";
+import NewColumnModal from "./new-column/NewColumnModal.js";
 import Column from "./Column.js";
 
 import classes from "./Column.module.css";
 
-export default function ColumnList() {
-  const { columns } = useContext(BoardContext);
+export default function ColumnList({ activeId, overId, activeSize }) {
+  const { columns } = useContext(BoardStateContext);
+
+  const modal = useRef();
+
+  function handleOpenModal() {
+    modal.current.open();
+  }
 
   return (
-    <ul className={classes.columnList}>
-      {columns.map((column) => (
-        <Column key={column.id} column={column} />
-      ))}
+    <>
+      <NewColumnModal ref={modal} />
 
-      <li className={classes.emptyColumn}>
-        <button className={classes.addColumnBtn}>+ New Column</button>
-      </li>
-    </ul>
+      <ul className={classes.columnList}>
+        {columns.map((column) => (
+          <Column
+            key={column.id}
+            column={column}
+            activeId={activeId}
+            overId={overId}
+            activeSize={activeSize}
+          />
+        ))}
+
+        <li className={classes.newColumn}>
+          <button className={classes.addColumnBtn} onClick={handleOpenModal}>
+            + New Column
+          </button>
+        </li>
+      </ul>
+    </>
   );
 }

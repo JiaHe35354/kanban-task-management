@@ -38,7 +38,8 @@ export default function StatusDropDown({ value, options, onChange }) {
 
   function handleSelect(option, e) {
     e.stopPropagation();
-    onChange(option.name);
+
+    onChange(option.id);
     setMenuOpen(false);
   }
 
@@ -67,7 +68,7 @@ export default function StatusDropDown({ value, options, onChange }) {
         >
           {options.map((option) => (
             <li
-              key={option.name}
+              key={option.id}
               className={classes.statusItem}
               onClick={(e) => handleSelect(option, e)}
             >

@@ -1,5 +1,8 @@
+"use client";
+
 import {
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -7,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { BoardActionsContext } from "@/context/BoardContext";
 import StatusDropDown from "@/components/ui/StatusDropDown";
 import CrossIcon from "@/assets/icon-cross.svg";
 
@@ -15,14 +19,35 @@ import classes from "./EditTaskModal.module.css";
 
 const EditTaskModal = forwardRef(function EditTaskModal(
   { task, columns, currentColumn },
-  ref
+  ref,
 ) {
-  const [mounted, setMounted] = useState(false);
   const dialog = useRef();
+
+  const [mounted, setMounted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [subtasks, setSubtasks] = useState([]);
+  const [status, setStatus] = useState("");
+
+  const { editTask } = useContext(BoardActionsContext);
+
+  const titleInvalid = !title.trim();
+  const hasEmptySubtask = subtasks.some((s) => !s.title.trim());
 
   useEffect(() => {
     setMounted(true);
-  });
+  }, []);
+
+  useEffect(() => {
+    if (!task) return;
+
+    setTitle(task.title);
+    setDescription(task.description || "");
+    setSubtasks(task.subtasks.map((s) => ({ ...s })));
+    setStatus(currentColumn?.id || "");
+  }, [task, currentColumn]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -31,13 +56,64 @@ const EditTaskModal = forwardRef(function EditTaskModal(
     };
   });
 
+  function resetForm() {
+    if (!task) return;
+
+    setTitle(task.title);
+    setDescription(task.description || "");
+    setSubtasks(task.subtasks.map((s) => ({ ...s })));
+    setStatus(currentColumn?.id || "");
+
+    setSubmitted(false);
+  }
+
   function handleBackdropClick(e) {
     if (e.target === dialog.current) {
+      resetForm();
       dialog.current.close();
     }
   }
 
-  if (!mounted) return null;
+  function handleAddSubtask() {
+    setSubtasks((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), title: "", isCompleted: false },
+    ]);
+    setSubmitted(false);
+  }
+
+  function handleUpdateSubtask(id, value) {
+    setSubtasks((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, title: value } : s)),
+    );
+
+    setSubmitted(false);
+  }
+
+  function handleRemoveSubtask(id) {
+    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitted(true);
+
+    if (titleInvalid || hasEmptySubtask) return;
+
+    editTask({
+      taskId: task.id,
+      title,
+      description,
+      status,
+      subtasks,
+    });
+
+    console.log("Editted task");
+
+    dialog.current.close();
+  }
+
+  if (!mounted || !task) return null;
 
   const modalRoot = document.getElementById("modal");
   if (!modalRoot) return null;
@@ -50,17 +126,30 @@ const EditTaskModal = forwardRef(function EditTaskModal(
         <button
           type="button"
           className="modalClose"
-          onClick={() => dialog.current.close()}
+          onClick={() => {
+            resetForm();
+            dialog.current.close();
+          }}
           aria-label="Close modal"
         >
           <CrossIcon />
         </button>
       </header>
 
-      <form className="form">
+      <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
           <label htmlFor="title">Title</label>
-          <input type="text" id="title" name="title" value={task.title} />
+          <div className={classes.inputWrapper}>
+            <input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={submitted && titleInvalid ? classes.inputError : ""}
+            />
+            {submitted && titleInvalid && (
+              <p className={classes.errorText}>Can't be empty</p>
+            )}
+          </div>
         </div>
 
         <div className="formControl">
@@ -69,31 +158,52 @@ const EditTaskModal = forwardRef(function EditTaskModal(
             id="description"
             name="description"
             rows="4"
-            value={task.description}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
         <div className="formControl">
-          <label htmlFor="subtasks">Subtasks</label>
+          <label>Subtasks</label>
 
           <div className={classes.subtasksWrapper}>
-            {task.subtasks.map((subtask) => (
-              <div key={subtask.title} className={classes.subtaskRow}>
-                <input
-                  type="text"
-                  id="subtasks"
-                  name="subtasks"
-                  value={subtask.title}
-                />
-                <button type="button" className={classes.closeBtn}>
-                  <CrossIcon />
-                </button>
-              </div>
-            ))}
+            {subtasks.map((subtask) => {
+              const isInvalid = submitted && !subtask.title.trim();
+
+              return (
+                <div key={subtask.id} className={classes.subtaskRow}>
+                  <div className={classes.inputWrapper}>
+                    <input
+                      value={subtask.title}
+                      onChange={(e) =>
+                        handleUpdateSubtask(subtask.id, e.target.value)
+                      }
+                      className={isInvalid ? classes.inputError : ""}
+                    />
+                    {isInvalid && (
+                      <p className={classes.errorText}>Can't be empty</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className={`${classes.closeBtn} ${
+                      isInvalid ? classes.btnError : ""
+                    }`}
+                    onClick={() => handleRemoveSubtask(subtask.id)}
+                  >
+                    <CrossIcon />
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
-          {task.subtasks.length <= 5 && (
-            <button type="button" className="btn btnSecondary">
+          {subtasks.length <= 5 && (
+            <button
+              type="button"
+              className="btn btnSecondary"
+              onClick={handleAddSubtask}
+            >
               + Add New Subtask
             </button>
           )}
@@ -102,15 +212,17 @@ const EditTaskModal = forwardRef(function EditTaskModal(
         <div className="formControl">
           <p className={classes.statusLabel}>Status</p>
 
-          <StatusDropDown value={currentColumn?.name} options={columns} />
+          <StatusDropDown
+            value={currentColumn?.name}
+            options={columns}
+            onChange={setStatus}
+          />
         </div>
 
-        <button type="button" className="btn btnPrimary">
-          Save Changes
-        </button>
+        <button className="btn btnPrimary">Save Changes</button>
       </form>
     </dialog>,
-    modalRoot
+    modalRoot,
   );
 });
 

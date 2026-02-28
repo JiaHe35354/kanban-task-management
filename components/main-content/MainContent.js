@@ -5,7 +5,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { createBoard, getBoardsByUser } from "@/lib/firestore/boards";
 import { createColumn } from "@/lib/firestore/columns";
 
-import { BoardContext } from "@/app/context/BoardContext";
+import { BoardActionsContext } from "@/context/BoardContext";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Header from "@/components/header/Header";
 import ShowSidebarIcon from "@/assets/icon-show-sidebar.svg";
@@ -14,7 +14,7 @@ import NewBoardModal from "./new-board-modal/NewBoardModal";
 import classes from "./MainContent.module.css";
 
 export default function MainContent({ children }) {
-  const { selectBoard, cerateNewBoard } = useContext(BoardContext);
+  const { selectBoard, cerateNewBoard } = useContext(BoardActionsContext);
 
   const modal = useRef();
 

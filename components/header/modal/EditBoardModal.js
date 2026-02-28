@@ -10,7 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardContext } from "@/app/context/BoardContext";
+import { BoardStateContext, BoardActionsContext } from "@/context/BoardContext";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
@@ -20,11 +20,15 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
   const [boardName, setBoardName] = useState("");
   const [cols, setCols] = useState([]);
   const [mounted, setMounted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const { activeBoard, columns, editBoard } = useContext(BoardContext);
+  const { columns } = useContext(BoardStateContext);
+  const { activeBoard, editBoard } = useContext(BoardActionsContext);
 
   const dialog = useRef();
-  const originalColumnsRef = useRef([]);
+
+  const boardNameInvalid = !boardName.trim();
+  const hasEmptyColumn = cols.some((c) => !c.name.trim());
 
   useEffect(() => {
     setMounted(true);
@@ -34,8 +38,7 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
     if (!activeBoard) return;
 
     setBoardName(activeBoard.name);
-    setCols(columns);
-    originalColumnsRef.current = columns;
+    setCols(columns.map((column) => ({ ...column })));
   }, [activeBoard, columns]);
 
   useImperativeHandle(ref, () => {
@@ -49,7 +52,9 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
     if (!activeBoard) return;
 
     setBoardName(activeBoard.name);
-    setCols(originalColumnsRef.current);
+    setCols(columns);
+
+    setSubmitted(false);
   }
 
   function handleBackdropClick(e) {
@@ -61,12 +66,16 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
 
   function handleAddColumn() {
     setCols((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
+
+    setSubmitted(false);
   }
 
   function handleUpdateColumn(id, value) {
     setCols((prev) =>
-      prev.map((col) => (col.id === id ? { ...col, name: value } : col))
+      prev.map((col) => (col.id === id ? { ...col, name: value } : col)),
     );
+
+    setSubmitted(false);
   }
 
   function handleRemoveColumn(id) {
@@ -75,8 +84,9 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setSubmitted(true);
 
-    if (!activeBoard) return;
+    if (boardNameInvalid || hasEmptyColumn) return;
 
     editBoard({
       boardId: activeBoard.id,
@@ -112,36 +122,58 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
       <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
           <label htmlFor="name">Board Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={boardName}
-            onChange={(e) => setBoardName(e.target.value)}
-          />
+          <div className={classes.inputWrapper}>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={boardName}
+              onChange={(e) => setBoardName(e.target.value)}
+              className={
+                submitted && boardNameInvalid ? classes.inputError : ""
+              }
+            />
+            {submitted && boardNameInvalid && (
+              <p className={classes.errorText}>Can't be empty</p>
+            )}
+          </div>
         </div>
 
         <div className="formControl">
           <label htmlFor="columns">Board Columns</label>
 
           <div className={classes.columnsWrapper}>
-            {cols.map((col) => (
-              <div key={col.id} className={classes.columnRow}>
-                <input
-                  type="text"
-                  value={col.name}
-                  onChange={(e) => handleUpdateColumn(col.id, e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={classes.closeBtn}
-                  disabled={cols.length === 1}
-                  onClick={() => handleRemoveColumn(col.id)}
-                >
-                  <CrossIcon />
-                </button>
-              </div>
-            ))}
+            {cols.map((col) => {
+              const isInvalid = submitted && !col.name.trim();
+
+              return (
+                <div key={col.id} className={classes.columnRow}>
+                  <div className={classes.inputWrapper}>
+                    <input
+                      type="text"
+                      value={col.name}
+                      onChange={(e) =>
+                        handleUpdateColumn(col.id, e.target.value)
+                      }
+                      className={isInvalid ? classes.inputError : ""}
+                    />
+                    {isInvalid && (
+                      <p className={classes.errorText}>Can't be empty</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className={`${classes.closeBtn} ${
+                      isInvalid ? classes.btnError : ""
+                    }`}
+                    disabled={cols.length === 1}
+                    onClick={() => handleRemoveColumn(col.id)}
+                  >
+                    <CrossIcon />
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           {cols.length <= 5 && (
@@ -158,7 +190,7 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
         <button className="btn btnPrimary">Save Changes</button>
       </form>
     </dialog>,
-    modalRoot
+    modalRoot,
   );
 });
 

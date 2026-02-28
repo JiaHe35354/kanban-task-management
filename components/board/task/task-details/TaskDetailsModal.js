@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,6 +10,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { BoardActionsContext } from "@/context/BoardContext";
 import { getSubtaskStats } from "@/utils/taskHelper";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import MenuButton from "./MenuButton";
@@ -20,8 +22,10 @@ import classes from "./TaskDetailsModal.module.css";
 
 const TaskDetailsModal = forwardRef(function TaskDetailsModal(
   { task, columns, currentColumn, onEdit, onDelete },
-  ref
+  ref,
 ) {
+  const { toggleSubtask, moveTask } = useContext(BoardActionsContext);
+
   const [mounted, setMounted] = useState(false);
   const dialog = useRef();
 
@@ -79,6 +83,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
                   type="checkbox"
                   id={subtask.id}
                   checked={subtask.isCompleted}
+                  onChange={() => toggleSubtask(task.id, subtask.id)}
                 />
                 <label htmlFor={subtask.id} className={classes.subtaskLabel}>
                   {subtask.title}
@@ -91,7 +96,11 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
         <div className={classes.status}>
           <h5 className={classes.statusLabel}>Current Status</h5>
 
-          <StatusDropDown value={currentColumn?.name} options={columns} />
+          <StatusDropDown
+            value={currentColumn?.name}
+            options={columns}
+            onChange={(newColumnId) => moveTask(task.id, newColumnId)}
+          />
         </div>
       </section>
 
@@ -108,7 +117,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
         </form>
       )}
     </dialog>,
-    modalRoot
+    modalRoot,
   );
 });
 

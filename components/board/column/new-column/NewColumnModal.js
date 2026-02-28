@@ -10,31 +10,33 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardActionsContext } from "@/context/BoardContext";
+import { BoardStateContext, BoardActionsContext } from "@/context/BoardContext";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
-import classes from "./NewBoardModal.module.css";
+import classes from "./NewColumnModal.module.css";
 
-const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
-  const { createNewBoard } = useContext(BoardActionsContext);
-
-  const dialog = useRef();
-
+const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
+  const [cols, setCols] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [boardName, setBoardName] = useState("");
-  const [columns, setColumns] = useState([
-    { id: crypto.randomUUID(), name: "" },
-  ]);
+  const { columns } = useContext(BoardStateContext);
+  const { activeBoard, updateColumns } = useContext(BoardActionsContext);
 
-  const boardNameInvalid = !boardName.trim();
-  const hasEmptyColumn = columns.some((col) => !col.name.trim());
+  const dialog = useRef();
+
+  const hasEmptyColumn = cols.some((c) => !c.name.trim());
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!activeBoard) return;
+
+    setCols(columns.map((column) => ({ ...column })));
+  }, [activeBoard, columns]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -44,53 +46,47 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
   });
 
   function resetForm() {
+    if (!activeBoard) return;
+
+    setCols(columns);
+
     setSubmitted(false);
-    setBoardName("");
-    setColumns([{ id: crypto.randomUUID(), name: "" }]);
   }
 
-  // Need to modify:
   function handleBackdropClick(e) {
     if (e.target === dialog.current) {
-      dialog.current.close();
       resetForm();
+      dialog.current.close();
     }
   }
 
-  function handleBoardNameChange(e) {
-    setBoardName(e.target.value);
-
-    if (submitted) setSubmitted(false);
-  }
-
   function handleAddColumn() {
-    setColumns((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
+    setCols((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
 
-    if (submitted) setSubmitted(false);
+    setSubmitted(false);
   }
 
   function handleUpdateColumn(id, value) {
-    setColumns((prev) =>
+    setCols((prev) =>
       prev.map((col) => (col.id === id ? { ...col, name: value } : col)),
     );
 
-    if (submitted) setSubmitted(false);
+    setSubmitted(false);
   }
 
   function handleRemoveColumn(id) {
-    setColumns((prev) => prev.filter((col) => col.id !== id));
+    setCols((prev) => prev.filter((col) => col.id !== id));
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
 
-    if (boardNameInvalid || hasEmptyColumn) return;
+    if (hasEmptyColumn) return;
 
-    createNewBoard({ boardName, columns });
+    updateColumns(activeBoard.id, cols);
 
     dialog.current.close();
-    resetForm();
   }
 
   if (!mounted) return null;
@@ -101,14 +97,13 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
   return createPortal(
     <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
       <header className="modalHeader">
-        <h4 className="modalHeading">Add New Board</h4>
-
+        <h4 className="modalHeading">Add New Column</h4>
         <button
           type="button"
           className="modalClose"
           onClick={() => {
-            dialog.current.close();
             resetForm();
+            dialog.current.close();
           }}
           aria-label="Close modal"
         >
@@ -118,40 +113,25 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
-          <label htmlFor="name">Name</label>
-
-          <div className={classes.inputWrapper}>
-            <input
-              type="text"
-              id="name"
-              placeholder="e.g. Web Design"
-              value={boardName}
-              onChange={handleBoardNameChange}
-              className={
-                submitted && boardNameInvalid ? classes.inputError : ""
-              }
-            />
-            {submitted && boardNameInvalid && (
-              <p className={classes.errorText}>Can't be empty</p>
-            )}
-          </div>
+          <label>Board Name</label>
+          <p className={classes.boardNameLabel}>{activeBoard?.name}</p>
         </div>
 
         <div className="formControl">
           <label htmlFor="columns">Columns</label>
 
           <div className={classes.columnsWrapper}>
-            {columns.map((column) => {
-              const isInvalid = submitted && !column.name.trim();
+            {cols.map((col) => {
+              const isInvalid = submitted && !col.name.trim();
 
               return (
-                <div key={column.id} className={classes.columnRow}>
+                <div key={col.id} className={classes.columnRow}>
                   <div className={classes.inputWrapper}>
                     <input
                       type="text"
-                      value={column.name}
+                      value={col.name}
                       onChange={(e) =>
-                        handleUpdateColumn(column.id, e.target.value)
+                        handleUpdateColumn(col.id, e.target.value)
                       }
                       className={isInvalid ? classes.inputError : ""}
                     />
@@ -164,8 +144,8 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
                     className={`${classes.closeBtn} ${
                       isInvalid ? classes.btnError : ""
                     }`}
-                    disabled={columns.length === 1}
-                    onClick={() => handleRemoveColumn(column.id)}
+                    disabled={cols.length === 1}
+                    onClick={() => handleRemoveColumn(col.id)}
                   >
                     <CrossIcon />
                   </button>
@@ -174,7 +154,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
             })}
           </div>
 
-          {columns.length <= 5 && (
+          {cols.length <= 5 && (
             <button
               type="button"
               className="btn btnSecondary"
@@ -185,11 +165,11 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
           )}
         </div>
 
-        <button className="btn btnPrimary">Create New Board</button>
+        <button className="btn btnPrimary">Save Changes</button>
       </form>
     </dialog>,
     modalRoot,
   );
 });
 
-export default NewBoardModal;
+export default NewColumnModal;

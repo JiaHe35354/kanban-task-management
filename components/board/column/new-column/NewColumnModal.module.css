@@ -1,3 +1,8 @@
+.boardNameLabel {
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
 .inputWrapper {
   position: relative;
   flex: 1;
@@ -39,6 +44,11 @@
   align-items: center;
   justify-content: stretch;
   gap: 1.6rem;
+}
+
+.columnRow input {
+  flex: 1;
+  /* font-weight: ; */
 }
 
 .columnRow .closeBtn {

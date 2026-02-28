@@ -1,3 +1,31 @@
+.inputWrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+.inputWrapper input {
+  width: 100%;
+}
+
+.errorText {
+  position: absolute;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.3rem;
+  color: var(--color-red);
+  pointer-events: none;
+}
+
+.inputError {
+  border-color: var(--color-red) !important;
+}
+
+.btnError {
+  color: var(--color-red) !important;
+}
+
 .columnsWrapper {
   margin-bottom: 1rem;
   display: flex;

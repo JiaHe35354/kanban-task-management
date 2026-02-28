@@ -1,6 +1,5 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { BoardContext } from "@/app/context/BoardContext";
-import EditBoardModal from "./modal/EditBoardModal";
+import { useEffect, useRef, useState } from "react";
+
 import EllipsisIcon from "@/assets/icon-vertical-ellipsis.svg";
 
 import classes from "./HeaderMenuButton.module.css";

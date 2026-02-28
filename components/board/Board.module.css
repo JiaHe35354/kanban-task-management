@@ -4,3 +4,24 @@
   overflow-x: scroll;
   overflow-y: scroll;
 }
+
+.overlay {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: var(--background);
+  padding: 2.3rem 1.8rem;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.5rem 0.8rem rgba(107, 118, 134, 0.2);
+}
+
+.taskTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.8rem;
+  transition: var(--transition);
+}
+.subtasks {
+  color: var(--text-color2);
+  font-size: 1.2rem;
+  font-weight: bold;
+}

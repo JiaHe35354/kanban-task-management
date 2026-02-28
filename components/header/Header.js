@@ -2,10 +2,10 @@
 
 import { useContext, useRef } from "react";
 
+import { BoardActionsContext } from "@/context/BoardContext";
 import NewTaskModal from "./modal/NewTaskModal";
 import EditBoardModal from "./modal/EditBoardModal";
 import DeleteBoardModal from "./modal/DeleteBoardModal";
-import { BoardContext } from "@/app/context/BoardContext";
 import HeaderLogo from "./HeaderLogo";
 import AddTaskMobileIcon from "@/assets/icon-add-task-mobile.svg";
 import HeaderMenuButton from "./HeaderMenuButton";
@@ -15,7 +15,7 @@ import classes from "./Header.module.css";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 export default function Header({ onToggleSidebar, isOpen }) {
-  const { activeBoard } = useContext(BoardContext);
+  const { activeBoard } = useContext(BoardActionsContext);
 
   const newTaskModal = useRef();
   const editBoardModal = useRef();

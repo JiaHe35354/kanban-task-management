@@ -2,6 +2,7 @@
 
 import {
   forwardRef,
+  useContext,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -9,20 +10,22 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
+import { BoardStateContext, BoardActionsContext } from "@/context/BoardContext";
 import CrossIcon from "@/assets/icon-cross.svg";
 import StatusDropDown from "@/components/ui/StatusDropDown";
-import { getColumnsByBoard } from "@/lib/firestore/columns";
 
 import "@/app/globals.css";
 import classes from "./NewTaskModal.module.css";
 
-const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
+const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
+  const { columns } = useContext(BoardStateContext);
+  const { createNewTask } = useContext(BoardActionsContext);
+
   const dialog = useRef();
 
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [columns, setColumns] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [subtasks, setSubtasks] = useState([
@@ -30,30 +33,20 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
   ]);
   const [status, setStatus] = useState("");
 
+  const selectedColumn = columns.find((c) => c.id === status) || columns[0];
+
   const titleInvalid = submitted && !title.trim();
+  const hasEmptySubtask = subtasks.some((s) => !s.title.trim());
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!activeBoard) return;
-
-    async function loadColumns() {
-      const data = await getColumnsByBoard(activeBoard.id);
-      setColumns(data);
-
-      console.log(data);
+    if (columns.length > 0 && !status) {
+      setStatus(columns[0].id);
     }
-
-    loadColumns();
-  }, [activeBoard]);
-
-  useEffect(() => {
-    if (columns.length > 0) {
-      setStatus(columns[0].name);
-    }
-  }, [columns]);
+  }, [columns, status]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -62,22 +55,12 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
     };
   });
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitted(true);
-
-    if (!title.trim() || subtasks.some((s) => !s.title.trim())) return;
-
-    const task = {
-      title,
-      description,
-      status,
-      subtasks,
-    };
-
-    console.log("Create task", task);
-
-    // onCreateTask(task);
+  function resetForm() {
+    setTitle("");
+    setDescription("");
+    setSubtasks([{ id: crypto.randomUUID(), title: "" }]);
+    setStatus(columns[0]?.id || "");
+    setSubmitted(false);
 
     dialog.current.close();
   }
@@ -85,6 +68,8 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
   function handleBackdropClick(e) {
     if (e.target === e.currentTarget) {
       e.currentTarget.close();
+
+      resetForm();
     }
   }
 
@@ -95,13 +80,35 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
   function handleUpdateSubtask(id, value) {
     setSubtasks((prev) =>
       prev.map((subtask) =>
-        subtask.id === id ? { ...subtask, title: value } : subtask
-      )
+        subtask.id === id ? { ...subtask, title: value } : subtask,
+      ),
     );
+
+    setSubmitted(false);
   }
 
   function handleRemoveSubtask(id) {
     setSubtasks((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitted(true);
+
+    if (titleInvalid || hasEmptySubtask) return;
+
+    const task = {
+      title,
+      description,
+      status,
+      subtasks,
+    };
+
+    // console.log("Create task", task);
+
+    createNewTask(task);
+
+    resetForm();
   }
 
   if (!mounted) return null;
@@ -176,10 +183,9 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
                       id="subtasks"
                       value={subtask.title}
                       className={isInvalid ? classes.inputError : ""}
-                      onChange={(e) => {
-                        handleUpdateSubtask(subtask.id, e.target.value);
-                        if (submitted) setSubmitted(false);
-                      }}
+                      onChange={(e) =>
+                        handleUpdateSubtask(subtask.id, e.target.value)
+                      }
                     />
                     {isInvalid && (
                       <p className={classes.errorText}>Can't be empty</p>
@@ -209,11 +215,10 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
         </div>
 
         <div className="formControl">
-          <p className={classes.statusLabel}>Status</p>
+          <label className={classes.statusLabel}>Status</label>
 
-          <input type="hidden" name="status" value={status} />
           <StatusDropDown
-            value={status}
+            value={selectedColumn?.name ?? "Select stataus"}
             options={columns}
             onChange={setStatus}
           />
@@ -222,7 +227,7 @@ const NewTaskModal = forwardRef(function NewTaskModal({ activeBoard }, ref) {
         <button className="btn btnPrimary">Create Task</button>
       </form>
     </dialog>,
-    modalRoot
+    modalRoot,
   );
 });
 
