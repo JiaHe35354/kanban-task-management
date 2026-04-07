@@ -43,8 +43,6 @@
   opacity: 0;
   transform: translateY(-1rem) scale(0.9);
   pointer-events: none;
-
-  transition: var(--transition);
 }
 
 .open {
@@ -68,4 +66,15 @@
 .menuItem.danger:hover {
   color: var(--red-hover);
   opacity: 1;
+}
+
+.menuBtn {
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  transition: var(--transition);
+  cursor: pointer;
 }

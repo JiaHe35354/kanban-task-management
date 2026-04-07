@@ -2,19 +2,25 @@
 
 import { useContext, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { createBoard, getBoardsByUser } from "@/lib/firestore/boards";
-import { createColumn } from "@/lib/firestore/columns";
 
-import { BoardActionsContext } from "@/context/BoardContext";
+import {
+  BoardActionsContext,
+  BoardStateContext,
+} from "@/context/board/BoardProvider";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Header from "@/components/header/Header";
 import ShowSidebarIcon from "@/assets/icon-show-sidebar.svg";
 import NewBoardModal from "./new-board-modal/NewBoardModal";
+import SkeletonColumn from "../ui/skeletons/SkeletonColumn";
 
+import "@/app/globals.css";
 import classes from "./MainContent.module.css";
 
 export default function MainContent({ children }) {
-  const { selectBoard, cerateNewBoard } = useContext(BoardActionsContext);
+  const { boards, isBoardLoading, isDataLoading, error } =
+    useContext(BoardStateContext);
+  const { selectBoard, loadBoards, loadBoardData } =
+    useContext(BoardActionsContext);
 
   const modal = useRef();
 
@@ -23,18 +29,6 @@ export default function MainContent({ children }) {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
-  // async function handleCreateTask({ title, description, status, subtasks }) {
-  //   const column = columns.find((c) => c.name === status);
-  //   if (!column) return;
-
-  //   const order = tasks.filter((t) => t.columnId === column.id).length;
-
-  //   // 🔹 optimistic UI later
-  //   await createTask(activeBoardId, column.id, title, description, order);
-
-  //   // then create subtasks
-  // }
 
   function handleSelectBoard(boardId) {
     selectBoard(boardId);
@@ -63,9 +57,38 @@ export default function MainContent({ children }) {
     setIsMobileSidebarOpen(false);
   }
 
+  const BoardSkeleton = (
+    <div className={classes.boardSkeletonWrapper}>
+      <div className={classes.columnListSkeleton}>
+        <SkeletonColumn />
+        <SkeletonColumn />
+        <SkeletonColumn />
+      </div>
+    </div>
+  );
+
+  if (error && boards.length === 0) {
+    return (
+      <div className={classes.errorOverlay}>
+        <div className={classes.errorCard}>
+          <h2>Oops! Something went wrong</h2>
+          <p className={classes.text}>{error}</p>
+          <button
+            className="addBtn"
+            onClick={() => {
+              loadBoards();
+            }}
+          >
+            Please Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <NewBoardModal ref={modal} onCreateBoard={cerateNewBoard} />
+      <NewBoardModal ref={modal} />
 
       <div
         className={`${classes.appLayout} ${
@@ -73,6 +96,7 @@ export default function MainContent({ children }) {
         }`}
       >
         <Header
+          error={error}
           isOpen={isMobileSidebarOpen}
           onToggleSidebar={() => setIsMobileSidebarOpen((prev) => !prev)}
         />
@@ -96,7 +120,7 @@ export default function MainContent({ children }) {
 
         {isMobile && isMobileSidebarOpen && (
           <>
-            <div
+            <aside
               className={`${classes.backdrop} ${
                 isMobileSidebarOpen ? "fade-in" : "fade-out"
               }`}
@@ -107,18 +131,57 @@ export default function MainContent({ children }) {
                 onSelectBoard={handleSelectBoard}
                 onOpenModal={handleOpenModal}
                 isMobile={isMobile}
+                isBoardLoading={isBoardLoading}
               />
             </div>
           </>
         )}
 
-        <main className={classes.mainContent}>
-          {children}
+        <main
+          className={`${classes.mainContent} ${boards.length === 0 || error ? classes.center : ""} `}
+        >
+          {error ? (
+            <div className={classes.centerEmpty}>
+              <div className={classes.emptyContent}>
+                <h2>Board Load Failed</h2>
+                <p className={classes.text}>{error}</p>
+                <button
+                  className="addBtn"
+                  onClick={() => loadBoardData(activeBoardId)}
+                >
+                  Retry Loading Columns
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {(isBoardLoading || isDataLoading) && BoardSkeleton}
 
-          {!isSidebarOpen && !isMobile && (
-            <button className={classes.btnShow} onClick={handleShowSidebar}>
-              <ShowSidebarIcon />
-            </button>
+              {!isBoardLoading && !isDataLoading && boards.length === 0 && (
+                <div className={classes.centerEmpty}>
+                  <div className={classes.emptyContent}>
+                    <p className={classes.text}>
+                      There are no boards available. Create a new board to get
+                      started.
+                    </p>
+                    <button className="addBtn" onClick={handleOpenModal}>
+                      + Create New Board
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!isBoardLoading &&
+                !isDataLoading &&
+                boards.length > 0 &&
+                children}
+
+              {!isSidebarOpen && !isMobile && (
+                <button className={classes.btnShow} onClick={handleShowSidebar}>
+                  <ShowSidebarIcon />
+                </button>
+              )}
+            </>
           )}
         </main>
       </div>

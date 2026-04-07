@@ -1,47 +1,58 @@
-import { useContext, useMemo } from "react";
+import { memo, useContext, useMemo } from "react";
+import { BoardStateContext } from "@/context/board/BoardProvider";
 import { useDroppable } from "@dnd-kit/core";
 
-import { BoardStateContext } from "@/context/BoardContext";
 import TaskList from "../task/TaskList";
 
 import classes from "./Column.module.css";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
-export default function Column({ column, activeId, overId, activeSize }) {
-  const { tasks } = useContext(BoardStateContext);
+function Column({ column }) {
+  const { tasksById, columnTaskIds } = useContext(BoardStateContext);
 
-  const { setNodeRef } = useDroppable({ id: column.id });
+  const taskIds = useMemo(
+    () => columnTaskIds?.[column.id] ?? [],
+    [columnTaskIds, column.id],
+  );
 
-  const sortedTasks = useMemo(() => {
-    return tasks
-      .filter((task) => task.columnId === column.id)
-      .sort((a, b) => a.order - b.order);
-  }, [tasks, column.id]);
+  const columnTasks = useMemo(() => {
+    return taskIds.map((id) => tasksById[id]).filter(Boolean);
+  }, [taskIds, tasksById]);
 
-  const overIndex = sortedTasks.findIndex((t) => t.id === overId);
+  const tasksCount = columnTasks.length;
 
-  const placeholderIndex =
-    overIndex > -1 && overIndex < sortedTasks.length - 1 ? overIndex : null;
+  const { setNodeRef } = useDroppable({
+    id: column.id,
+    data: {
+      type: "Column",
+      columnId: column.id,
+    },
+  });
 
   return (
-    <div ref={setNodeRef}>
-      <li className={classes.columnListItem}>
-        <div className={classes.columnHeader}>
-          <span
-            className={classes.dot}
-            style={{ backgroundColor: column.color }}
-          />
-          <p
-            className={classes.columnTitle}
-          >{`${column.name} (${sortedTasks.length})`}</p>
-        </div>
-
-        <TaskList
-          tasks={sortedTasks}
-          placeholderIndex={placeholderIndex}
-          activeId={activeId}
-          activeSize={activeSize}
+    <li ref={setNodeRef} className={classes.columnListItem}>
+      <div className={classes.columnHeader}>
+        <span
+          className={classes.dot}
+          style={{ backgroundColor: column.color }}
         />
-      </li>
-    </div>
+        <p
+          className={classes.columnTitle}
+        >{`${column.name} (${tasksCount})`}</p>
+      </div>
+
+      <SortableContext
+        id={column.id}
+        items={taskIds}
+        strategy={verticalListSortingStrategy}
+      >
+        <TaskList columnId={column.id} tasks={columnTasks} />
+      </SortableContext>
+    </li>
   );
 }
+
+export default memo(Column);

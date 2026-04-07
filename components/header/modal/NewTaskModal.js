@@ -10,15 +10,19 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardStateContext, BoardActionsContext } from "@/context/BoardContext";
+import {
+  BoardStateContext,
+  BoardActionsContext,
+} from "@/context/board/BoardProvider";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import CrossIcon from "@/assets/icon-cross.svg";
 import StatusDropDown from "@/components/ui/StatusDropDown";
 
 import "@/app/globals.css";
-import classes from "./NewTaskModal.module.css";
+import { useModalCleanup } from "@/hooks/useModalCleanup";
 
-const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
-  const { columns } = useContext(BoardStateContext);
+const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
+  const { columns, isDataLoading } = useContext(BoardStateContext);
   const { createNewTask } = useContext(BoardActionsContext);
 
   const dialog = useRef();
@@ -26,27 +30,43 @@ const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [subtasks, setSubtasks] = useState([
-    { id: crypto.randomUUID(), title: "" },
-  ]);
-  const [status, setStatus] = useState("");
+  const [formError, setFormError] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    subtasks: [{ id: crypto.randomUUID(), title: "" }],
+    status: "",
+  });
 
-  const selectedColumn = columns.find((c) => c.id === status) || columns[0];
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
 
-  const titleInvalid = submitted && !title.trim();
-  const hasEmptySubtask = subtasks.some((s) => !s.title.trim());
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (columns.length > 0 && !status) {
-      setStatus(columns[0].id);
+    if (
+      columns.length > 0 &&
+      !columns.some((col) => col.id === formData.status)
+    ) {
+      setFormData((prev) => ({ ...prev, status: columns[0].id }));
     }
-  }, [columns, status]);
+  }, [columns, formData.status]);
+
+  function resetForm() {
+    setFormData({
+      title: "",
+      description: "",
+      subtasks: [{ id: crypto.randomUUID(), title: "" }],
+      status: columns[0]?.id || "",
+    });
+
+    setSubmitted(false);
+    setFormError(null);
+  }
+
+  const { handleBackdropClick, handleEscKey } = useModalCleanup(
+    dialog,
+    resetForm,
+  );
 
   useImperativeHandle(ref, () => {
     return {
@@ -55,101 +75,102 @@ const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
     };
   });
 
-  function resetForm() {
-    setTitle("");
-    setDescription("");
-    setSubtasks([{ id: crypto.randomUUID(), title: "" }]);
-    setStatus(columns[0]?.id || "");
-    setSubmitted(false);
-
-    dialog.current.close();
-  }
-
-  function handleBackdropClick(e) {
-    if (e.target === e.currentTarget) {
-      e.currentTarget.close();
-
-      resetForm();
-    }
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   function handleAddSubtask() {
-    setSubtasks((prev) => [...prev, { id: crypto.randomUUID(), title: "" }]);
+    setFormData((prev) => ({
+      ...prev,
+      subtasks: [...prev.subtasks, { id: crypto.randomUUID(), title: "" }],
+    }));
   }
 
   function handleUpdateSubtask(id, value) {
-    setSubtasks((prev) =>
-      prev.map((subtask) =>
-        subtask.id === id ? { ...subtask, title: value } : subtask,
+    setFormData((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks.map((s) =>
+        s.id === id ? { ...s, title: value } : s,
       ),
-    );
-
-    setSubmitted(false);
+    }));
   }
 
   function handleRemoveSubtask(id) {
-    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+    setFormData((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks.filter((s) => s.id !== id),
+    }));
   }
 
-  function handleSubmit(e) {
+  const titleInvalid = !formData.title.trim();
+  const hasEmptySubtask = formData.subtasks.some((s) => !s.title.trim());
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
+    setFormError(null);
 
     if (titleInvalid || hasEmptySubtask) return;
 
-    const task = {
-      title,
-      description,
-      status,
-      subtasks,
-    };
+    try {
+      await createNewTask(formData);
 
-    // console.log("Create task", task);
-
-    createNewTask(task);
-
-    resetForm();
+      resetForm();
+      dialog.current.close();
+    } catch (err) {
+      setFormError("Failed to create task. Please try again.");
+    }
   }
 
-  if (!mounted) return null;
+  if (!mounted || columns.length === 0) return null;
 
-  const modalRoot = document.getElementById("modal");
+  const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;
 
+  const selectedColumn =
+    columns.find((c) => c.id === formData.status) || columns[0];
+
   return createPortal(
-    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
+    <dialog
+      ref={dialog}
+      className="modal"
+      onClick={!isDataLoading ? handleBackdropClick : undefined}
+      onCancel={isDataLoading ? (e) => e.preventDefault() : handleEscKey}
+    >
       <header className="modalHeader">
         <h4 className="modalHeading">Add New Task</h4>
-        <button
-          type="button"
-          className="modalClose"
-          onClick={() => dialog.current.close()}
-          aria-label="Close modal"
-        >
-          <CrossIcon />
-        </button>
+
+        {isMobile && (
+          <button
+            type="button"
+            className="modalCloseBtn"
+            onClick={resetForm}
+            disabled={isDataLoading}
+            aria-label="Close modal"
+          >
+            <CrossIcon />
+          </button>
+        )}
       </header>
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
           <label htmlFor="title">Title</label>
 
-          <div className={classes.inputWrapper}>
+          <div className="inputWrapper">
             <input
-              type="text"
               id="title"
               name="title"
-              value={title}
-              className={titleInvalid ? classes.inputError : ""}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                if (submitted) setSubmitted(false);
-              }}
+              value={formData.title}
+              disabled={isDataLoading}
+              className={submitted && titleInvalid ? "inputError" : ""}
+              onChange={handleChange}
               placeholder="e.g. Take coffee break"
             />
 
-            {titleInvalid && (
-              <p className={classes.errorText}>Can't be empty</p>
+            {submitted && titleInvalid && (
+              <p className="errorText">Can't be empty</p>
             )}
           </div>
         </div>
@@ -159,10 +180,9 @@ const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
           <textarea
             id="description"
             name="description"
-            value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
+            value={formData.description}
+            disabled={isDataLoading}
+            onChange={handleChange}
             rows="4"
             placeholder="e.g. It's always good to take a break. This 15 minute break will recharge the batteries a little."
           />
@@ -171,41 +191,44 @@ const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
         <div className="formControl">
           <label htmlFor="subtasks">Subtasks</label>
 
-          <div className={classes.subtasksWrapper}>
-            {subtasks.map((subtask) => {
+          <div className="rowsWrapper">
+            {formData.subtasks.map((subtask) => {
               const isInvalid = submitted && !subtask.title.trim();
 
               return (
-                <div key={subtask.id} className={classes.subtaskRow}>
-                  <div className={classes.inputWrapper}>
+                <div key={subtask.id} className="row">
+                  <div className="inputWrapper">
                     <input
-                      type="text"
                       id="subtasks"
                       value={subtask.title}
-                      className={isInvalid ? classes.inputError : ""}
+                      disabled={isDataLoading}
+                      className={isInvalid ? "inputError" : ""}
                       onChange={(e) =>
                         handleUpdateSubtask(subtask.id, e.target.value)
                       }
                     />
-                    {isInvalid && (
-                      <p className={classes.errorText}>Can't be empty</p>
-                    )}
+                    {isInvalid && <p className="errorText">Can't be empty</p>}
                   </div>
-                  <button
-                    type="button"
-                    className={classes.closeBtn}
-                    onClick={() => handleRemoveSubtask(subtask.id)}
-                  >
-                    <CrossIcon />
-                  </button>
+
+                  {formData.subtasks.length > 1 && (
+                    <button
+                      type="button"
+                      disabled={isDataLoading}
+                      className={`closeBtn ${isInvalid ? "errorBtn" : ""}`}
+                      onClick={() => handleRemoveSubtask(subtask.id)}
+                    >
+                      <CrossIcon />
+                    </button>
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {subtasks.length <= 5 && (
+          {formData.subtasks.length <= 5 && (
             <button
               type="button"
+              disabled={isDataLoading}
               className="btn btnSecondary"
               onClick={handleAddSubtask}
             >
@@ -215,16 +238,23 @@ const NewTaskModal = forwardRef(function NewTaskModal({ onCreateTask }, ref) {
         </div>
 
         <div className="formControl">
-          <label className={classes.statusLabel}>Status</label>
+          <label className="statusLabel">Status</label>
 
           <StatusDropDown
-            value={selectedColumn?.name ?? "Select stataus"}
+            value={selectedColumn?.name}
             options={columns}
-            onChange={setStatus}
+            onChange={(val) =>
+              setFormData((prev) => ({ ...prev, status: val }))
+            }
+            disabled={isDataLoading}
           />
         </div>
 
-        <button className="btn btnPrimary">Create Task</button>
+        {formError && <p className="formErrorText">{formError}</p>}
+
+        <button className="btn btnPrimary" disabled={isDataLoading}>
+          {isDataLoading ? "Creating..." : "Create Task"}
+        </button>
       </form>
     </dialog>,
     modalRoot,

@@ -1,7 +1,10 @@
 .taskList {
+  flex-grow: 1;
   min-height: 80vh;
-  border-radius: 0.8rem;
+  /* height: 100%; */
+  /* border-radius: 0.8rem; */
   list-style: none;
+  padding-bottom: 5rem;
   display: flex;
   flex-direction: column;
   gap: 2.2rem;
@@ -11,32 +14,26 @@
   border: 2px dashed var(--line);
 }
 
-.dropPlaceholder {
-  /* margin: 6px 0;
-  border-radius: 8px;
-
-  background: rgba(99, 102, 241, 0.15);
-  border: 2px dashed rgba(99, 102, 241, 0.6);
-
-  transition: all 0.15s ease; */
-}
-
 .taskListItem {
   background-color: var(--background);
-  padding: 2.3rem 1.8rem;
+  list-style: none;
   border-radius: 0.8rem;
-  box-shadow: 0 0.5rem 0.8rem rgba(107, 118, 134, 0.2);
-  cursor: pointer;
-  transition: var(--transition);
+  box-shadow: var(--card-shadow);
 }
 
-.taskListItem:hover,
-.taskListItem:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: 0 1rem 2rem rgba(151, 151, 151, 0.15);
+.taskBtn {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  padding: 2.3rem 1.8rem;
+  color: inherit;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
 .taskTitle {
+  color: var(--text-color1);
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 0.8rem;
@@ -47,7 +44,7 @@
   color: var(--main-purple);
 }
 
-.subtasks {
+.subtaskTitle {
   color: var(--text-color2);
   font-size: 1.2rem;
   font-weight: bold;

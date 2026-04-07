@@ -22,13 +22,11 @@
 
 .dropdownMenu {
   position: fixed;
-  /* top: 35%;
-  left: 60%; */
 
   list-style: none;
   padding: 2rem 2rem;
-  width: 19rem;
-  /* background-color: var(--background); */
+  width: 19.2rem;
+
   background-color: var(--background);
   border-radius: 0.8rem;
   color: var(--text-color2);
@@ -49,13 +47,14 @@
   transition: var(--transition);
 }
 
-.open {
+.dropdownMenu.open {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
 .menuItem {
+  width: 100%;
   cursor: pointer;
 }
 
@@ -70,4 +69,15 @@
 .menuItem.danger:hover {
   color: var(--red-hover);
   opacity: 1;
+}
+
+.menuBtn {
+  background-color: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  transition: var(--transition);
+  cursor: pointer;
 }

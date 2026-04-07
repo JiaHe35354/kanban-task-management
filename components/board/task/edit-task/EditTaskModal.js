@@ -10,130 +10,177 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardActionsContext } from "@/context/BoardContext";
+import { BoardActionsContext } from "@/context/board/BoardProvider";
 import StatusDropDown from "@/components/ui/StatusDropDown";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 import classes from "./EditTaskModal.module.css";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useModalCleanup } from "@/hooks/useModalCleanup";
+import { useTaskModal } from "@/context/board/TaskModalContext";
 
 const EditTaskModal = forwardRef(function EditTaskModal(
   { task, columns, currentColumn },
   ref,
 ) {
-  const dialog = useRef();
-
-  const [mounted, setMounted] = useState(false);
+  const [form, setForm] = useState(null);
+  const [formError, setFormError] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [subtasks, setSubtasks] = useState([]);
-  const [status, setStatus] = useState("");
+  const dialog = useRef();
 
   const { editTask } = useContext(BoardActionsContext);
 
-  const titleInvalid = !title.trim();
-  const hasEmptySubtask = subtasks.some((s) => !s.title.trim());
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
+  const { closeTaskModal } = useTaskModal();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!task) return;
-
-    setTitle(task.title);
-    setDescription(task.description || "");
-    setSubtasks(task.subtasks.map((s) => ({ ...s })));
-    setStatus(currentColumn?.id || "");
-  }, [task, currentColumn]);
-
-  useImperativeHandle(ref, () => {
+  function createFormState(task) {
     return {
-      open: () => dialog.current.showModal(),
-      close: () => dialog.current.close(),
+      title: task.title,
+      description: task.description,
+      subtasks: task.subtasks?.map((s) => ({ ...s })) ?? [],
+      columnId: task.columnId,
     };
-  });
+  }
 
   function resetForm() {
     if (!task) return;
-
-    setTitle(task.title);
-    setDescription(task.description || "");
-    setSubtasks(task.subtasks.map((s) => ({ ...s })));
-    setStatus(currentColumn?.id || "");
-
+    setForm(createFormState(task));
     setSubmitted(false);
+    setFormError(null);
   }
 
-  function handleBackdropClick(e) {
-    if (e.target === dialog.current) {
-      resetForm();
-      dialog.current.close();
+  const { handleBackdropClick, handleEscKey } = useModalCleanup(
+    dialog,
+    resetForm,
+    closeTaskModal,
+  );
+
+  useEffect(() => {
+    if (task) {
+      setForm(createFormState(task));
+      setFormError(null);
     }
-  }
+  }, [task?.id]);
+
+  useImperativeHandle(ref, () => {
+    return {
+      open: () => {
+        if (!dialog.current?.open) {
+          dialog.current.showModal();
+        }
+      },
+      close: () => {
+        if (dialog.current?.open) {
+          dialog.current.close();
+        }
+      },
+    };
+  });
+
+  if (!task || !form) return null;
+
+  const titleInvalid = !form?.title?.trim();
+  const hasEmptySubtask = form?.subtasks?.some((s) => !s.title.trim());
+  const selectedColumn = columns.find((c) => c.id === form?.columnId);
+
+  const isTitleChanged = form?.title !== task.title;
+  const isDescriptionChanged = form?.description !== task.description;
+  const isSubChanged =
+    form.subtasks.length !== (task.subtasks?.length || 0) ||
+    form.subtasks.some((sub, index) => {
+      const original = task.subtasks?.[index];
+      return sub.title !== original?.title || sub.id !== original?.id;
+    });
+  const isStatusChanged = form?.columnId !== task.columnId;
+
+  const isDataChanged =
+    isTitleChanged || isDescriptionChanged || isSubChanged || isStatusChanged;
 
   function handleAddSubtask() {
-    setSubtasks((prev) => [
+    setForm((prev) => ({
       ...prev,
-      { id: crypto.randomUUID(), title: "", isCompleted: false },
-    ]);
-    setSubmitted(false);
+      subtasks: [
+        ...prev.subtasks,
+        { id: crypto.randomUUID(), title: "", isCompleted: false },
+      ],
+    }));
   }
 
   function handleUpdateSubtask(id, value) {
-    setSubtasks((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, title: value } : s)),
-    );
-
-    setSubmitted(false);
+    setForm((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks.map((s) =>
+        s.id === id ? { ...s, title: value } : s,
+      ),
+    }));
   }
 
   function handleRemoveSubtask(id) {
-    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+    setForm((prev) => ({
+      ...prev,
+      subtasks: prev.subtasks.filter((s) => s.id !== id),
+    }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
+    setFormError(null);
 
     if (titleInvalid || hasEmptySubtask) return;
 
-    editTask({
-      taskId: task.id,
-      title,
-      description,
-      status,
-      subtasks,
-    });
+    const modal = dialog.current;
 
-    console.log("Editted task");
+    setIsSaving(true);
+    try {
+      await editTask({
+        taskId: task.id,
+        title: form.title,
+        description: form.description,
+        status: form.columnId,
+        subtasks: form.subtasks,
+      });
 
-    dialog.current.close();
+      modal?.close();
+      closeTaskModal();
+    } catch (err) {
+      setFormError("Failed to save changes. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
-  if (!mounted || !task) return null;
-
-  const modalRoot = document.getElementById("modal");
+  const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
+    <dialog
+      ref={dialog}
+      className="modal"
+      onClick={!isSaving ? handleBackdropClick : undefined}
+      onCancel={isSaving ? (e) => e.preventDefault() : handleEscKey}
+    >
       <header className="modalHeader">
         <h4 className="modalHeading">Edit Task</h4>
 
-        <button
-          type="button"
-          className="modalClose"
-          onClick={() => {
-            resetForm();
-            dialog.current.close();
-          }}
-          aria-label="Close modal"
-        >
-          <CrossIcon />
-        </button>
+        {isMobile && (
+          <button
+            type="button"
+            className="modalCloseBtn"
+            disabled={isSaving}
+            onClick={() => {
+              resetForm();
+              dialog.current.close();
+              closeTaskModal();
+            }}
+            aria-label="Close modal"
+          >
+            <CrossIcon />
+          </button>
+        )}
       </header>
 
       <form className="form" onSubmit={handleSubmit}>
@@ -142,8 +189,11 @@ const EditTaskModal = forwardRef(function EditTaskModal(
           <div className={classes.inputWrapper}>
             <input
               id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={form?.title ?? ""}
+              disabled={isSaving}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, title: e.target.value }))
+              }
               className={submitted && titleInvalid ? classes.inputError : ""}
             />
             {submitted && titleInvalid && (
@@ -158,8 +208,11 @@ const EditTaskModal = forwardRef(function EditTaskModal(
             id="description"
             name="description"
             rows="4"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={form?.description ?? ""}
+            disabled={isSaving}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, description: e.target.value }))
+            }
           />
         </div>
 
@@ -167,7 +220,7 @@ const EditTaskModal = forwardRef(function EditTaskModal(
           <label>Subtasks</label>
 
           <div className={classes.subtasksWrapper}>
-            {subtasks.map((subtask) => {
+            {form?.subtasks?.map((subtask) => {
               const isInvalid = submitted && !subtask.title.trim();
 
               return (
@@ -175,6 +228,7 @@ const EditTaskModal = forwardRef(function EditTaskModal(
                   <div className={classes.inputWrapper}>
                     <input
                       value={subtask.title}
+                      disabled={isSaving}
                       onChange={(e) =>
                         handleUpdateSubtask(subtask.id, e.target.value)
                       }
@@ -190,6 +244,7 @@ const EditTaskModal = forwardRef(function EditTaskModal(
                       isInvalid ? classes.btnError : ""
                     }`}
                     onClick={() => handleRemoveSubtask(subtask.id)}
+                    disabled={isSaving}
                   >
                     <CrossIcon />
                   </button>
@@ -198,10 +253,11 @@ const EditTaskModal = forwardRef(function EditTaskModal(
             })}
           </div>
 
-          {subtasks.length <= 5 && (
+          {form?.subtasks?.length <= 5 && (
             <button
               type="button"
               className="btn btnSecondary"
+              disabled={isSaving}
               onClick={handleAddSubtask}
             >
               + Add New Subtask
@@ -213,13 +269,23 @@ const EditTaskModal = forwardRef(function EditTaskModal(
           <p className={classes.statusLabel}>Status</p>
 
           <StatusDropDown
-            value={currentColumn?.name}
+            value={selectedColumn?.name || currentColumn?.name}
             options={columns}
-            onChange={setStatus}
+            onChange={(columnId) =>
+              setForm((prev) => ({ ...prev, columnId: columnId }))
+            }
+            disabled={isSaving}
           />
         </div>
 
-        <button className="btn btnPrimary">Save Changes</button>
+        {formError && <p className="formErrorText">{formError}</p>}
+
+        <button
+          className="btn btnPrimary"
+          disabled={!isDataChanged || isSaving}
+        >
+          {isSaving ? "Saving" : "Save Changes"}
+        </button>
       </form>
     </dialog>,
     modalRoot,

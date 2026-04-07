@@ -1,0 +1,96 @@
+.skeletonColumn {
+  min-height: 80vh;
+  width: 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+
+  flex-shrink: 0;
+  flex-grow: 0;
+
+  padding-bottom: 5rem;
+}
+
+.skeletonColumnHeader {
+  width: 15rem;
+  height: 1.5rem;
+  background-color: var(--text-color2);
+  opacity: 0.2;
+  border-radius: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonTaskCard {
+  width: 100%;
+  height: 12rem;
+  background-color: var(--background);
+  box-shadow: var(--card-shadow);
+  padding: 2.3rem 1.8rem;
+  border-radius: 0.8rem;
+  opacity: 0.8;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonPulse {
+  background-color: var(--text-color2);
+  opacity: 0.15;
+  border-radius: 0.4rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonTask {
+  width: 80%;
+  height: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.skeletonSubtask {
+  width: 40%;
+  height: 1.2rem;
+}
+
+.skeletonHeading {
+  width: 20rem;
+  height: 3rem;
+  background-color: var(--text-color2);
+  opacity: 0.1;
+  border: 0.4rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeletonSidebarItem {
+  padding: 1.5rem 1.5rem 1.5rem 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.skeletonSidebarIcon {
+  width: 1.6rem;
+  height: 1.6rem;
+  background-color: var(--text-color2);
+  opacity: 0.1;
+  border-radius: 0.2rem;
+  animation: pulse 1.5s infinite;
+}
+
+.skeletonBar {
+  width: 15rem;
+  height: 1.6rem;
+  background-color: var(--text-color2);
+  opacity: 0.1;
+  border-radius: 0.4rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}

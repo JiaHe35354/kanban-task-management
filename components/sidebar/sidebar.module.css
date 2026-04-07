@@ -2,14 +2,14 @@
   height: 100%;
   background-color: var(--background);
   color: var(--text-color2);
-  padding: 1.5rem 0 3rem 0;
+  padding: 2rem 0 3rem 0;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.boardsBtns {
+.listWrapper {
   padding-right: 2.5rem;
 }
 
@@ -26,14 +26,16 @@
   list-style: none;
 }
 
-.list .iconHide {
-}
-
-.listItem {
+.boardBtn {
+  width: 100%;
+  font-family: inherit;
   font-size: 1.5rem;
   font-weight: bold;
+  color: inherit;
   padding: 1.5rem;
   padding-left: 3rem;
+  background: transparent;
+  border: none;
   cursor: pointer;
   transition: var(--transition);
 
@@ -42,16 +44,16 @@
   gap: 1.8rem;
 }
 
-.listItem:hover {
+.boardBtn:hover {
   background-color: var(--bg-sidebar-hover);
+  color: var(--main-purple);
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
-  color: var(--main-purple);
 }
 
-.listItem.active {
-  background-color: var(--btn-bg-primary);
-  color: var(--btn-text-primary);
+.boardBtn.active {
+  background-color: var(--main-purple);
+  color: var(--white);
   border-top-right-radius: 50px;
   border-bottom-right-radius: 50px;
 }

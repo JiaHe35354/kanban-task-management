@@ -1,6 +1,8 @@
 .boardNameLabel {
+  color: var(--text-color1);
   font-size: 1.3rem;
   font-weight: 500;
+  margin-top: 0.6rem;
 }
 
 .inputWrapper {

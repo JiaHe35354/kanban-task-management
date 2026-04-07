@@ -6,7 +6,7 @@
       "columns": [
         {
           "id": "col-todo",
-          "name": "Todo",
+          "name": "To Do",
           "color": "#49c4e5"
         },
         {
@@ -346,7 +346,7 @@
       "columns": [
         {
           "id": "col-todo",
-          "name": "Todo",
+          "name": "To Do",
           "color": "#49c4e5"
         },
         {

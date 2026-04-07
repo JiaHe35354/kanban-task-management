@@ -1,29 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
 import classes from "./StatusDropdown.module.css";
 
-export default function StatusDropDown({ value, options, onChange }) {
+export default function StatusDropDown({ value, options, onChange, disabled }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState(null);
+
   const buttonRef = useRef();
 
-  // DOESN'T WORK
-  // useEffect(() => {
-  //   function handleClickOutside(e) {
-  //     if (!buttonRef.current?.contains(e.target)) {
-  //       setMenuOpen(false);
-  //     }
-  //   }
-
-  //   if (menuOpen) {
-  //     window.addEventListener("click", handleClickOutside);
-  //   }
-
-  //   return () => window.removeEventListener("click", handleClickOutside);
-  // }, [menuOpen]);
-
   function toggleMenu() {
+    if (disabled) return;
+
     const rect = buttonRef.current.getBoundingClientRect();
     const dropdownOffset = 10;
 
@@ -49,6 +37,7 @@ export default function StatusDropDown({ value, options, onChange }) {
         type="button"
         ref={buttonRef}
         className={classes.statusBtn}
+        disabled={disabled}
         onClick={toggleMenu}
       >
         <span>{value}</span>
@@ -57,9 +46,10 @@ export default function StatusDropDown({ value, options, onChange }) {
         </span>
       </button>
 
-      {menuOpen && (
+      {!disabled && menuOpen && (
         <ul
           className={classes.statusList}
+          onClick={(e) => e.stopPropagation()}
           style={{
             top: dropdownPos.top,
             left: dropdownPos.left,
@@ -67,12 +57,14 @@ export default function StatusDropDown({ value, options, onChange }) {
           }}
         >
           {options.map((option) => (
-            <li
-              key={option.id}
-              className={classes.statusItem}
-              onClick={(e) => handleSelect(option, e)}
-            >
-              {option.name}
+            <li key={option.id} className={classes.statusItem}>
+              <button
+                type="button"
+                className={classes.statusItemBtn}
+                onClick={(e) => handleSelect(option, e)}
+              >
+                {option.name}
+              </button>
             </li>
           ))}
         </ul>

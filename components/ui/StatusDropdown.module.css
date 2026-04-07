@@ -44,11 +44,18 @@
   gap: 1.5rem;
 }
 
-.statusItem {
+.statusItemBtn {
+  text-align: left;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-color2);
+  font-family: inherit;
+  font-size: 1.3rem;
   cursor: pointer;
   transition: var(--transition);
 }
 
-.statusItem:hover {
+.statusItemBtn:hover {
   color: var(--text-color1);
 }

@@ -10,129 +10,155 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardActionsContext } from "@/context/BoardContext";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useModalCleanup } from "@/hooks/useModalCleanup";
+import {
+  BoardActionsContext,
+  BoardStateContext,
+} from "@/context/board/BoardProvider";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
-import classes from "./NewBoardModal.module.css";
 
 const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
-  const { createNewBoard } = useContext(BoardActionsContext);
-
-  const dialog = useRef();
-
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
   const [boardName, setBoardName] = useState("");
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const [columns, setColumns] = useState([
     { id: crypto.randomUUID(), name: "" },
   ]);
+  const [formError, setFormError] = useState(null);
 
-  const boardNameInvalid = !boardName.trim();
-  const hasEmptyColumn = columns.some((col) => !col.name.trim());
+  const { boards, isDataLoading } = useContext(BoardStateContext);
+  const { createNewBoard } = useContext(BoardActionsContext);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const dialog = useRef();
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
+
+  useEffect(() => setMounted(true), []);
+
+  const resetForm = () => {
+    setSubmitted(false);
+    setBoardName("");
+    setIsDuplicate(false);
+    setFormError(null);
+    setColumns([{ id: crypto.randomUUID(), name: "" }]);
+  };
+
+  const { handleBackdropClick, handleEscKey } = useModalCleanup(
+    dialog,
+    resetForm,
+  );
 
   useImperativeHandle(ref, () => {
     return {
-      open: () => dialog.current.showModal(),
+      open: () => {
+        resetForm();
+        dialog.current.showModal();
+      },
       close: () => dialog.current.close(),
     };
   });
 
-  function resetForm() {
-    setSubmitted(false);
-    setBoardName("");
-    setColumns([{ id: crypto.randomUUID(), name: "" }]);
-  }
-
-  // Need to modify:
-  function handleBackdropClick(e) {
-    if (e.target === dialog.current) {
-      dialog.current.close();
-      resetForm();
-    }
-  }
-
   function handleBoardNameChange(e) {
     setBoardName(e.target.value);
-
-    if (submitted) setSubmitted(false);
+    setIsDuplicate(false);
   }
 
   function handleAddColumn() {
     setColumns((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
-
-    if (submitted) setSubmitted(false);
   }
 
   function handleUpdateColumn(id, value) {
     setColumns((prev) =>
       prev.map((col) => (col.id === id ? { ...col, name: value } : col)),
     );
-
-    if (submitted) setSubmitted(false);
   }
 
   function handleRemoveColumn(id) {
     setColumns((prev) => prev.filter((col) => col.id !== id));
   }
 
-  function handleSubmit(e) {
+  const boardNameInvalid = !boardName.trim();
+  const hasEmptyCol = columns.some((c) => !c.name.trim());
+
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
+    setFormError(null);
 
-    if (boardNameInvalid || hasEmptyColumn) return;
+    if (boardNameInvalid || hasEmptyCol) return;
 
-    createNewBoard({ boardName, columns });
-
-    dialog.current.close();
-    resetForm();
+    try {
+      await createNewBoard({ boardName, columns });
+      dialog.current.close();
+    } catch (err) {
+      if (err.message === "BOARD_EXISTS") {
+        setIsDuplicate(true);
+      } else {
+        setFormError("Failed to create board. Please check your connection.");
+      }
+    }
   }
 
   if (!mounted) return null;
 
-  const modalRoot = document.getElementById("modal");
+  const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
+    <dialog
+      ref={dialog}
+      className="modal"
+      onClick={(e) => {
+        !isDataLoading ? handleBackdropClick(e) : undefined;
+      }}
+      onCancel={(e) => {
+        isDataLoading ? e.preventDefault() : handleEscKey();
+      }}
+    >
       <header className="modalHeader">
         <h4 className="modalHeading">Add New Board</h4>
 
-        <button
-          type="button"
-          className="modalClose"
-          onClick={() => {
-            dialog.current.close();
-            resetForm();
-          }}
-          aria-label="Close modal"
-        >
-          <CrossIcon />
-        </button>
+        {isMobile && (
+          <button
+            type="button"
+            className="modalCloseBtn"
+            disabled={isDataLoading}
+            onClick={() => {
+              !isDataLoading && dialog.current.close();
+            }}
+            aria-label="Close modal"
+          >
+            <CrossIcon />
+          </button>
+        )}
       </header>
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="formControl">
           <label htmlFor="name">Name</label>
 
-          <div className={classes.inputWrapper}>
+          <div className="inputWrapper">
             <input
               type="text"
               id="name"
               placeholder="e.g. Web Design"
+              disabled={isDataLoading}
               value={boardName}
               onChange={handleBoardNameChange}
               className={
-                submitted && boardNameInvalid ? classes.inputError : ""
+                submitted && (boardNameInvalid || isDuplicate)
+                  ? "inputError"
+                  : ""
               }
             />
             {submitted && boardNameInvalid && (
-              <p className={classes.errorText}>Can't be empty</p>
+              <p className="errorText">Can't be empty</p>
+            )}
+            {submitted && isDuplicate && (
+              <p className="errorText">Name already used</p>
             )}
           </div>
         </div>
@@ -140,35 +166,35 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
         <div className="formControl">
           <label htmlFor="columns">Columns</label>
 
-          <div className={classes.columnsWrapper}>
+          <div className="rowsWrapper">
             {columns.map((column) => {
               const isInvalid = submitted && !column.name.trim();
 
               return (
-                <div key={column.id} className={classes.columnRow}>
-                  <div className={classes.inputWrapper}>
+                <div key={column.id} className="row">
+                  <div className="inputWrapper">
                     <input
                       type="text"
+                      disabled={isDataLoading}
                       value={column.name}
                       onChange={(e) =>
                         handleUpdateColumn(column.id, e.target.value)
                       }
-                      className={isInvalid ? classes.inputError : ""}
+                      className={isInvalid ? "inputError" : ""}
                     />
-                    {isInvalid && (
-                      <p className={classes.errorText}>Can't be empty</p>
-                    )}
+                    {isInvalid && <p className="errorText">Can't be empty</p>}
                   </div>
-                  <button
-                    type="button"
-                    className={`${classes.closeBtn} ${
-                      isInvalid ? classes.btnError : ""
-                    }`}
-                    disabled={columns.length === 1}
-                    onClick={() => handleRemoveColumn(column.id)}
-                  >
-                    <CrossIcon />
-                  </button>
+
+                  {columns.length > 1 && (
+                    <button
+                      type="button"
+                      className={`closeBtn ${isInvalid ? "errorBtn" : ""}`}
+                      disabled={isDataLoading}
+                      onClick={() => handleRemoveColumn(column.id)}
+                    >
+                      <CrossIcon />
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -177,6 +203,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
           {columns.length <= 5 && (
             <button
               type="button"
+              disabled={isDataLoading}
               className="btn btnSecondary"
               onClick={handleAddColumn}
             >
@@ -185,7 +212,11 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
           )}
         </div>
 
-        <button className="btn btnPrimary">Create New Board</button>
+        {formError && <p className="formErrorText">{formError}</p>}
+
+        <button className="btn btnPrimary" disabled={isDataLoading}>
+          {isDataLoading ? "Creating..." : "Create New Board"}
+        </button>
       </form>
     </dialog>,
     modalRoot,

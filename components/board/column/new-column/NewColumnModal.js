@@ -10,7 +10,12 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardStateContext, BoardActionsContext } from "@/context/BoardContext";
+import {
+  BoardStateContext,
+  BoardActionsContext,
+} from "@/context/board/BoardProvider";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useModalCleanup } from "@/hooks/useModalCleanup";
 import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
@@ -20,95 +25,108 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
   const [cols, setCols] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState(null);
 
-  const { columns } = useContext(BoardStateContext);
-  const { activeBoard, updateColumns } = useContext(BoardActionsContext);
+  const { columns, activeBoard } = useContext(BoardStateContext);
+  const { updateColumns } = useContext(BoardActionsContext);
 
   const dialog = useRef();
 
-  const hasEmptyColumn = cols.some((c) => !c.name.trim());
+  const isMobile = useMediaQuery("(max-width: 46.25em)");
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { handleBackdropClick, handleEscKey } = useModalCleanup(
+    dialog,
+    resetForm,
+  );
 
-  useEffect(() => {
-    if (!activeBoard) return;
+  const getFormData = () => {
+    if (!columns) return;
+    setCols(columns.map((c) => ({ ...c })));
+  };
 
-    setCols(columns.map((column) => ({ ...column })));
-  }, [activeBoard, columns]);
+  useEffect(() => setMounted(true), []);
 
   useImperativeHandle(ref, () => {
     return {
-      open: () => dialog.current.showModal(),
+      open: () => {
+        if (!activeBoard) return;
+
+        getFormData();
+
+        dialog.current.showModal();
+      },
       close: () => dialog.current.close(),
     };
   });
 
   function resetForm() {
-    if (!activeBoard) return;
-
-    setCols(columns);
-
     setSubmitted(false);
+    setFormError(null);
+    getFormData();
   }
 
-  function handleBackdropClick(e) {
-    if (e.target === dialog.current) {
-      resetForm();
+  const handleAddColumn = () =>
+    setCols((p) => [...p, { id: crypto.randomUUID(), name: "" }]);
+  const handleRemoveColumn = (id) =>
+    setCols((p) => p.filter((c) => c.id !== id));
+  const handleUpdateColumn = (id, val) => {
+    setCols((p) => p.map((c) => (c.id === id ? { ...c, name: val } : c)));
+    setSubmitted(false);
+  };
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitted(true);
+    setFormError(null);
+
+    const hasEmptyColumn = cols.some((c) => !c.name.trim());
+    if (hasEmptyColumn) return;
+
+    setIsSaving(true);
+    try {
+      await updateColumns(activeBoard.id, cols);
       dialog.current.close();
+    } catch (err) {
+      setFormError("Failed to update columns. Please check your connection.");
+    } finally {
+      setIsSaving(false);
     }
   }
 
-  function handleAddColumn() {
-    setCols((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
-
-    setSubmitted(false);
-  }
-
-  function handleUpdateColumn(id, value) {
-    setCols((prev) =>
-      prev.map((col) => (col.id === id ? { ...col, name: value } : col)),
-    );
-
-    setSubmitted(false);
-  }
-
-  function handleRemoveColumn(id) {
-    setCols((prev) => prev.filter((col) => col.id !== id));
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitted(true);
-
-    if (hasEmptyColumn) return;
-
-    updateColumns(activeBoard.id, cols);
-
-    dialog.current.close();
-  }
+  const areColumnsChanged =
+    cols.length !== columns.length ||
+    cols.some((col, index) => {
+      const original = columns[index];
+      return col.name !== original?.name || col.id !== original?.id;
+    });
 
   if (!mounted) return null;
 
-  const modalRoot = document.getElementById("modal");
+  const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;
 
   return createPortal(
-    <dialog ref={dialog} className="modal" onClick={handleBackdropClick}>
+    <dialog
+      ref={dialog}
+      className="modal"
+      onClick={!isSaving ? handleBackdropClick : undefined}
+      onCancel={isSaving ? (e) => e.preventDefault() : handleEscKey}
+    >
       <header className="modalHeader">
         <h4 className="modalHeading">Add New Column</h4>
-        <button
-          type="button"
-          className="modalClose"
-          onClick={() => {
-            resetForm();
-            dialog.current.close();
-          }}
-          aria-label="Close modal"
-        >
-          <CrossIcon />
-        </button>
+
+        {isMobile && (
+          <button
+            type="button"
+            className="modalCloseBtn"
+            disabled={isSaving}
+            onClick={() => !isSaving && dialog.current.close()}
+            aria-label="Close modal"
+          >
+            <CrossIcon />
+          </button>
+        )}
       </header>
 
       <form className="form" onSubmit={handleSubmit}>
@@ -130,6 +148,7 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
                     <input
                       type="text"
                       value={col.name}
+                      disabled={isSaving}
                       onChange={(e) =>
                         handleUpdateColumn(col.id, e.target.value)
                       }
@@ -139,16 +158,19 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
                       <p className={classes.errorText}>Can't be empty</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    className={`${classes.closeBtn} ${
-                      isInvalid ? classes.btnError : ""
-                    }`}
-                    disabled={cols.length === 1}
-                    onClick={() => handleRemoveColumn(col.id)}
-                  >
-                    <CrossIcon />
-                  </button>
+
+                  {cols.length > 1 && (
+                    <button
+                      type="button"
+                      className={`${classes.closeBtn} ${
+                        isInvalid ? classes.btnError : ""
+                      }`}
+                      disabled={isSaving}
+                      onClick={() => handleRemoveColumn(col.id)}
+                    >
+                      <CrossIcon />
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -158,6 +180,7 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
             <button
               type="button"
               className="btn btnSecondary"
+              disabled={isSaving}
               onClick={handleAddColumn}
             >
               + Add New Column
@@ -165,7 +188,14 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
           )}
         </div>
 
-        <button className="btn btnPrimary">Save Changes</button>
+        {formError && <p className="formErrorText">{formError}</p>}
+
+        <button
+          className="btn btnPrimary"
+          disabled={!areColumnsChanged || isSaving}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
       </form>
     </dialog>,
     modalRoot,

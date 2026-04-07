@@ -3,12 +3,16 @@
   display: flex;
   gap: 2.5rem;
   padding-right: 2.5rem;
+  height: 100%;
 }
 
 .columnListItem,
 .newColumn {
+  height: 100%;
   width: 28rem;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .columnHeader {
@@ -35,7 +39,7 @@
 
 .newColumn {
   background-image: var(--background-tertiary);
-  min-height: 80vh;
+  height: 80vh;
   margin-right: 2.5rem;
   margin-top: 4rem;
   border-radius: 0.8rem;

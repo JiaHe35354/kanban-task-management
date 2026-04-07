@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useContext } from "react";
+import { ThemeContext } from "@/context/ThemeContext";
 import LightThemeIcon from "/assets/icon-light-theme.svg";
 import DarkThemeIcon from "/assets/icon-dark-theme.svg";
 
 import classes from "./ThemeToggle.module.css";
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState("light");
+  const { theme, setTheme } = useContext(ThemeContext);
 
   return (
     <fieldset
@@ -29,6 +30,7 @@ export default function ThemeToggle() {
             type="radio"
             name="theme"
             id="light"
+            value="light"
             checked={theme === "light"}
             onChange={() => setTheme("light")}
           />
@@ -36,6 +38,7 @@ export default function ThemeToggle() {
             type="radio"
             name="theme"
             id="dark"
+            value="dark"
             checked={theme === "dark"}
             onChange={() => setTheme("dark")}
           />

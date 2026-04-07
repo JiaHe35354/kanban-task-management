@@ -3,7 +3,7 @@ import EllipsisIcon from "@/assets/icon-vertical-ellipsis.svg";
 
 import classes from "./MenuButton.module.css";
 
-export default function MenuButton({ onEdit, onDelete }) {
+export default function MenuButton({ onOpenEdit, onOpenDelete, disabled }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState(null);
 
@@ -13,10 +13,11 @@ export default function MenuButton({ onEdit, onDelete }) {
   function toggleMenu(e) {
     const rect = e.currentTarget.getBoundingClientRect();
     const dropdownOffset = 18;
+    const dropdownWidth = 192;
 
     setDropdownPos({
       top: rect.bottom + dropdownOffset,
-      left: rect.left + rect.width / 2,
+      left: rect.left + rect.width / 2 - dropdownWidth / 2,
     });
 
     setIsMenuOpen((prev) => !prev);
@@ -50,36 +51,51 @@ export default function MenuButton({ onEdit, onDelete }) {
         aria-expanded={isMenuOpen}
         aria-controls="options-menu"
         onClick={toggleMenu}
+        disabled={disabled}
       >
         <EllipsisIcon />
       </button>
 
-      {isMenuOpen && (
-        <ul
-          ref={menuRef}
-          role="menu"
-          id="options-menu"
-          className={`${classes.dropdownMenu} ${
-            isMenuOpen ? classes.open : ""
-          } `}
-          // style={{
-          //   top: `${dropdownPos.top}px`,
-          //   left: `${dropdownPos.left}px`,
-          //   transform: "translateX(-50%)",
-          //   position: "fixed",
-          // }}
-        >
-          <li className={classes.menuItem} onClick={onEdit}>
+      <ul
+        ref={menuRef}
+        role="menu"
+        id="options-menu"
+        className={`${classes.dropdownMenu} ${isMenuOpen ? classes.open : ""}`}
+        style={
+          dropdownPos
+            ? {
+                top: dropdownPos.top,
+                left: dropdownPos.left,
+              }
+            : undefined
+        }
+        onClick={(e) => e.stopPropagation()}
+      >
+        <li className={classes.menuItem}>
+          <button
+            type="button"
+            className={classes.menuBtn}
+            onClick={() => {
+              setIsMenuOpen(false);
+              onOpenEdit();
+            }}
+          >
             Edit Task
-          </li>
-          <li
-            className={`${classes.menuItem} ${classes.danger}`}
-            onClick={onDelete}
+          </button>
+        </li>
+        <li className={`${classes.menuItem} ${classes.danger}`}>
+          <button
+            type="button"
+            className={classes.menuBtn}
+            onClick={() => {
+              setIsMenuOpen(false);
+              onOpenDelete();
+            }}
           >
             Delete Task
-          </li>
-        </ul>
-      )}
+          </button>
+        </li>
+      </ul>
     </div>
   );
 }

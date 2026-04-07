@@ -28,6 +28,7 @@
 
 .heading {
   background: none;
+  color: var(--text-color1);
   border: none;
   font-family: inherit;
   font-weight: inherit;
@@ -55,8 +56,8 @@
 }
 
 .plusBtn {
-  color: var(--btn-text-primary);
-  background-color: var(--btn-bg-primary);
+  color: var(--white);
+  background-color: var(--main-purple);
   border: none;
   width: 4.8rem;
   height: 3.2rem;
@@ -68,29 +69,14 @@
   align-items: center;
 }
 
+.plusBtn:disabled {
+  background-color: var(--main-purple-25);
+}
+
 .plusIcon {
+  display: block;
   width: 1.2rem;
   height: 1.2rem;
-}
-
-.addBtn {
-  border: none;
-
-  color: var(--btn-text-primary);
-  background-color: var(--btn-bg-primary);
-
-  font-family: inherit;
-  font-size: 1.5rem;
-  font-weight: 600;
-  padding: 1.5rem 3rem;
-  border-radius: 50px;
-  margin-right: 1.8rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.addBtn:hover {
-  background-color: var(--purple-hover);
 }
 
 @media only screen and (max-width: 64em) {

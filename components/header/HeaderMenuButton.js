@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import EllipsisIcon from "@/assets/icon-vertical-ellipsis.svg";
 
 import classes from "./HeaderMenuButton.module.css";
+import { BoardStateContext } from "@/context/board/BoardProvider";
 
-export default function HeaderMenuButton({ onOpenEdit, onOpenDelete }) {
+export default function HeaderMenuButton({ error, onOpenEdit, onOpenDelete }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const buttonRef = useRef(null);
   const menuRef = useRef(null);
+
+  const { boards } = useContext(BoardStateContext);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -22,10 +25,10 @@ export default function HeaderMenuButton({ onOpenEdit, onOpenDelete }) {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
@@ -38,6 +41,7 @@ export default function HeaderMenuButton({ onOpenEdit, onOpenDelete }) {
         aria-expanded={isMenuOpen}
         aria-controls="board-options-menu"
         onClick={() => setIsMenuOpen((prev) => !prev)}
+        disabled={boards.length === 0 || error}
       >
         <EllipsisIcon />
       </button>
@@ -48,14 +52,29 @@ export default function HeaderMenuButton({ onOpenEdit, onOpenDelete }) {
         id="board-options-menu"
         className={`${classes.dropdownMenu} ${isMenuOpen ? classes.open : ""} `}
       >
-        <li className={classes.menuItem} onClick={onOpenEdit}>
-          Edit Board
+        <li className={classes.menuItem}>
+          <button
+            className={classes.menuBtn}
+            type="button"
+            onClick={() => {
+              onOpenEdit();
+              setIsMenuOpen(false);
+            }}
+          >
+            Edit Board
+          </button>
         </li>
-        <li
-          className={`${classes.menuItem} ${classes.danger}`}
-          onClick={onOpenDelete}
-        >
-          Delete Board
+        <li className={`${classes.menuItem} ${classes.danger}`}>
+          <button
+            className={classes.menuBtn}
+            type="button"
+            onClick={() => {
+              onOpenDelete();
+              setIsMenuOpen(false);
+            }}
+          >
+            Delete Board
+          </button>
         </li>
       </ul>
     </div>

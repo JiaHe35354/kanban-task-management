@@ -12,12 +12,6 @@
   color: var(--text-color1);
 }
 
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-}
-
 .kebabBtn {
   border: none;
   background: transparent;

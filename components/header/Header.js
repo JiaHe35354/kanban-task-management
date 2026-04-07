@@ -2,7 +2,8 @@
 
 import { useContext, useRef } from "react";
 
-import { BoardActionsContext } from "@/context/BoardContext";
+import { BoardStateContext } from "@/context/board/BoardProvider";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import NewTaskModal from "./modal/NewTaskModal";
 import EditBoardModal from "./modal/EditBoardModal";
 import DeleteBoardModal from "./modal/DeleteBoardModal";
@@ -10,12 +11,13 @@ import HeaderLogo from "./HeaderLogo";
 import AddTaskMobileIcon from "@/assets/icon-add-task-mobile.svg";
 import HeaderMenuButton from "./HeaderMenuButton";
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
+import SkeletonTitle from "../ui/skeletons/SkeletonTitle";
 
 import classes from "./Header.module.css";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import "@/app/globals.css";
 
-export default function Header({ onToggleSidebar, isOpen }) {
-  const { activeBoard } = useContext(BoardActionsContext);
+export default function Header({ error, onToggleSidebar, isOpen }) {
+  const { activeBoard, boards, isBoardLoading } = useContext(BoardStateContext);
 
   const newTaskModal = useRef();
   const editBoardModal = useRef();
@@ -32,7 +34,9 @@ export default function Header({ onToggleSidebar, isOpen }) {
   }
 
   function handleOpenDeleteBoard() {
-    deleteBoardModal.current.open();
+    if (!activeBoard) return;
+
+    deleteBoardModal.current.open(activeBoard.id);
   }
 
   return (
@@ -48,7 +52,14 @@ export default function Header({ onToggleSidebar, isOpen }) {
 
         <div className={classes.mainHeader}>
           <button className={classes.heading} onClick={onToggleSidebar}>
-            <h1>{activeBoard ? activeBoard.name : "No board found"}</h1>
+            {isBoardLoading ? (
+              <SkeletonTitle />
+            ) : activeBoard ? (
+              <h1>{activeBoard.name}</h1>
+            ) : (
+              <h1>No board found</h1>
+            )}
+
             {isMobile && (
               <ChevronDownIcon
                 className={`${classes.chevronIcon} ${
@@ -59,17 +70,20 @@ export default function Header({ onToggleSidebar, isOpen }) {
           </button>
 
           <div className={classes.btnGroup}>
-            {isMobile ? (
-              <button className={classes.plusBtn} onClick={handleOpenNewTask}>
+            <button
+              className={`${isMobile ? classes.plusBtn : "addBtn"}  `}
+              onClick={handleOpenNewTask}
+              disabled={!activeBoard || error || boards.length === 0}
+            >
+              {isMobile ? (
                 <AddTaskMobileIcon className={classes.plusIcon} />
-              </button>
-            ) : (
-              <button className={classes.addBtn} onClick={handleOpenNewTask}>
-                + Add New Tasks
-              </button>
-            )}
+              ) : (
+                "+ Add New Tasks"
+              )}
+            </button>
 
             <HeaderMenuButton
+              error={error}
               onOpenDelete={handleOpenDeleteBoard}
               onOpenEdit={handleOpenEditBoard}
             />
