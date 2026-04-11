@@ -3,16 +3,14 @@
 import {
   forwardRef,
   useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
 
-import {
-  BoardActionsContext,
-  BoardStateContext,
-} from "@/context/board/BoardProvider";
+import { BoardActionsContext } from "@/context/board/BoardProvider";
 import { getSubtaskStats } from "@/utils/taskHelper";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import MenuButton from "./MenuButton";
@@ -30,6 +28,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   const { toggleSubtask, moveTask } = useContext(BoardActionsContext);
   const { closeTaskModal } = useTaskModal();
@@ -43,10 +42,18 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
     closeTaskModal,
   );
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useImperativeHandle(ref, () => {
     return {
-      open: () => dialog.current.showModal(),
-      close: () => dialog.current.close(),
+      open: () => {
+        if (dialog.current) dialog.current.showModal();
+      },
+      close: () => {
+        if (dialog.current) dialog.current.close();
+      },
     };
   });
 
@@ -65,6 +72,8 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
       setIsLoading(false);
     }
   }
+
+  if (!mounted || !task) return null;
 
   const modalRoot = document.getElementById("modal-root");
   if (!modalRoot) return null;

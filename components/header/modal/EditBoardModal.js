@@ -28,12 +28,10 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState(null);
 
-  const { boards, columns, activeBoard, isDataLoading } =
-    useContext(BoardStateContext);
+  const { columns, activeBoard, isDataLoading } = useContext(BoardStateContext);
   const { editBoard } = useContext(BoardActionsContext);
 
   const dialog = useRef();
-
   const isMobile = useMediaQuery("(max-width: 46.25em)");
 
   function getFormData() {
@@ -98,21 +96,8 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
-    setFormError(null);
-    setIsDuplicate(false);
 
     if (boardNameInvalid || hasEmptyColumn) return;
-
-    // const nameExists = boards.some(
-    //   (b) =>
-    //     b.id !== activeBoard.id &&
-    //     b.name.toLowerCase() === boardName.trim().toLowerCase(),
-    // );
-
-    // if (nameExists) {
-    //   setIsDuplicate(true);
-    //   return;
-    // }
 
     try {
       await editBoard({
@@ -161,7 +146,6 @@ const EditBoardModal = forwardRef(function EditBoardModal({}, ref) {
             className="modalCloseBtn"
             disabled={isDataLoading}
             onClick={() => {
-              resetForm();
               if (!isDataLoading) dialog.current.close();
             }}
             aria-label="Close modal"

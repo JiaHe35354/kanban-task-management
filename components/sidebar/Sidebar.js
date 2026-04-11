@@ -6,9 +6,12 @@ import { BoardStateContext } from "@/context/board/BoardProvider";
 import ThemeToggle from "./theme-toggle/ThemeToggle";
 import BoardIcon from "@/assets/icon-board.svg";
 import HideSidebarIcon from "@/assets/icon-hide-sidebar.svg";
+import LogoutIcon from "@/assets/icon-log-out.svg";
 import SkeletonSidebarItem from "../ui/skeletons/SkeletonSidebarItem";
 
 import classes from "./Sidebar.module.css";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar({
   onSelectBoard,
@@ -16,8 +19,19 @@ export default function Sidebar({
   onOpenModal,
   isMobile,
 }) {
+  const router = useRouter();
+  const { logout } = useAuth();
   const { activeBoardId, boards, isBoardLoading } =
     useContext(BoardStateContext);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (err) {
+      console.log("Failed to logout:", err);
+    }
+  };
 
   return (
     <nav className={classes.navbar}>
@@ -63,6 +77,10 @@ export default function Sidebar({
             <HideSidebarIcon className={classes.iconHide} /> Hide Sidebar
           </button>
         )}
+
+        <button className={classes.logoutBtn} onClick={handleLogout}>
+          <LogoutIcon className={classes.logoutIcon} /> <span>Log out</span>
+        </button>
       </div>
     </nav>
   );

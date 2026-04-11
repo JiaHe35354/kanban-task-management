@@ -11,7 +11,6 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import Header from "@/components/header/Header";
 import ShowSidebarIcon from "@/assets/icon-show-sidebar.svg";
 import NewBoardModal from "./new-board-modal/NewBoardModal";
-import SkeletonColumn from "../ui/skeletons/SkeletonColumn";
 
 import "@/app/globals.css";
 import classes from "./MainContent.module.css";
@@ -57,12 +56,11 @@ export default function MainContent({ children }) {
     setIsMobileSidebarOpen(false);
   }
 
-  const BoardSkeleton = (
-    <div className={classes.boardSkeletonWrapper}>
-      <div className={classes.columnListSkeleton}>
-        <SkeletonColumn />
-        <SkeletonColumn />
-        <SkeletonColumn />
+  const Spinner = (
+    <div className={classes.centerLoading}>
+      <div className={classes.spinnerWrapper}>
+        <div className="spinner"></div>
+        <p>Loading</p>
       </div>
     </div>
   );
@@ -155,7 +153,7 @@ export default function MainContent({ children }) {
             </div>
           ) : (
             <>
-              {(isBoardLoading || isDataLoading) && BoardSkeleton}
+              {(isBoardLoading || isDataLoading) && Spinner}
 
               {!isBoardLoading && !isDataLoading && boards.length === 0 && (
                 <div className={classes.centerEmpty}>

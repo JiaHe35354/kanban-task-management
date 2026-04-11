@@ -28,6 +28,7 @@
   --red-hover: #ff9898;
   --medium-grey: #828fa3;
   --medium-grey-25: rgba(130, 143, 163, 0.25);
+  --medium-grey-50: rgba(130, 143, 163, 0.5);
 
   --dot1: #49c4e5;
   --dot2: #8471f2;
@@ -354,6 +355,37 @@ body {
   opacity: 0.7;
 }
 
+/* LOADING */
+.authLoadingScreen {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--light-grey);
+  color: var(--very-dark-grey);
+  font-size: 1.8rem;
+}
+
+.spinner {
+  width: 4rem;
+  height: 4rem;
+  border: 4px solid var(--lines-light);
+  border-top: 4px solid var(--main-purple);
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* UTILITIES */
 .visuallyHidden {
   position: absolute;
@@ -402,6 +434,12 @@ body {
   animation: fadeOut 0.2s ease-out;
 }
 
+.focusRing:focus-visible {
+  outline: 2px solid var(--main-purple);
+  outline-offset: 2px;
+}
+
+/* 740px */
 @media only screen and (max-width: 46.25em) {
   .modal {
     padding: 2rem 2.2rem;

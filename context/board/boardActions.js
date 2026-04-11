@@ -31,61 +31,60 @@ import { COLUMN_COLORS } from "@/constants/columnColors";
 import { toTitleCase } from "@/utils/stringHelper";
 import { normalizeTasks } from "@/utils/taskHelper";
 
-export function createBoardActions(stateRef, dispatch) {
-  async function withLoading(actionFn) {
-    dispatch({ type: "SET_DATA_LOADING", payload: true });
-
+export function createBoardActions(stateRef, dispatch, userId) {
+  async function withProcess(loadingType, actionFn, errorMessage) {
+    dispatch({ type: loadingType, payload: true });
+    dispatch({ type: "SET_ERROR", payload: null });
     try {
       await actionFn();
+    } catch (err) {
+      console.error(err);
+      dispatch({ type: "SET_ERROR", payload: errorMessage });
+      throw err;
     } finally {
-      dispatch({ type: "SET_DATA_LOADING", payload: false });
+      dispatch({ type: loadingType, payload: false });
     }
   }
 
   async function loadBoards() {
-    try {
-      dispatch({ type: "SET_ERROR", payload: null });
-      const data = await getBoardsByUser("user123");
-      dispatch({ type: "SET_BOARDS", payload: data });
-    } catch (err) {
-      dispatch({
-        type: "SET_ERROR",
-        payload:
-          "Failed to load boards. Please check your internet connection.",
-      });
-    }
+    if (!userId) return;
+
+    await withProcess(
+      "SET_BOARD_LOADING",
+      async () => {
+        const data = await getBoardsByUser(userId);
+        dispatch({ type: "SET_BOARDS", payload: data });
+      },
+      "Failed to load boards. Please check your internet connection.",
+    );
   }
 
   async function loadBoardData(boardId) {
     if (!boardId) return;
 
-    try {
-      dispatch({ type: "SET_ERROR", payload: null });
-      const cols = await getColumnsByBoard(boardId);
-      const rawTasks = await getTasksByBoard(boardId);
+    await withProcess(
+      "SET_DATA_LOADING",
+      async () => {
+        const cols = await getColumnsByBoard(boardId);
+        const rawTasks = await getTasksByBoard(boardId);
 
-      const tasksWithSubtasks = await Promise.all(
-        rawTasks.map(async (task) => {
-          const subtasks = await getSubtasksByTask(task.id);
-          return { ...task, subtasks };
-        }),
-      );
+        const tasksWithSubtasks = await Promise.all(
+          rawTasks.map(async (task) => {
+            const subtasks = await getSubtasksByTask(task.id);
+            return { ...task, subtasks };
+          }),
+        );
 
-      const { tasksById, columnTaskIds } = normalizeTasks(tasksWithSubtasks);
-      // console.log("tasksById:", tasksById, "columnTaskIds:", columnTaskIds);
+        const { tasksById, columnTaskIds } = normalizeTasks(tasksWithSubtasks);
+        // console.log("tasksById:", tasksById, "columnTaskIds:", columnTaskIds);
 
-      dispatch({
-        type: "SET_BOARD_DATA",
-        payload: { columns: cols, tasksById, columnTaskIds },
-      });
-    } catch (err) {
-      dispatch({
-        type: "SET_ERROR",
-        payload: "Failed to load board content. Please refresh.",
-      });
-
-      throw err;
-    }
+        dispatch({
+          type: "SET_BOARD_DATA",
+          payload: { columns: cols, tasksById, columnTaskIds },
+        });
+      },
+      "Failed to load board content. Please refresh.",
+    );
   }
 
   async function selectBoard(boardId) {
@@ -104,9 +103,10 @@ export function createBoardActions(stateRef, dispatch) {
       throw new Error("BOARD_EXISTS");
     }
 
-    try {
-      await withLoading(async () => {
-        const realBoardId = await createBoard("user123", formattedName);
+    await withProcess(
+      "SET_DATA_LOADING",
+      async () => {
+        const realBoardId = await createBoard(userId, formattedName);
 
         await Promise.all(
           columns.map((col, i) =>
@@ -123,10 +123,9 @@ export function createBoardActions(stateRef, dispatch) {
         dispatch({ type: "SET_ACTIVE_BOARD", payload: realBoardId });
         await loadBoardData(realBoardId);
         console.log(state.activeBoard);
-      });
-    } catch (err) {
-      throw err;
-    }
+      },
+      "Failed to create board.",
+    );
   }
 
   async function editBoard({ boardId, name, columns }) {
@@ -144,8 +143,9 @@ export function createBoardActions(stateRef, dispatch) {
       throw new Error("BOARD_EXISTS");
     }
 
-    try {
-      await withLoading(async () => {
+    await withProcess(
+      "SET_DATA_LOADING",
+      async () => {
         const boardPromise = updateBoard(boardId, { name: formattedBoardName });
 
         const originalColumns = state.columns;
@@ -187,16 +187,15 @@ export function createBoardActions(stateRef, dispatch) {
         // Refresh data
         await loadBoards();
         await loadBoardData(boardId);
-      });
-    } catch (err) {
-      console.log("Failed to edit board:", err);
-      throw err;
-    }
+      },
+      "Failed to edit board:",
+    );
   }
 
   async function deleteBoard(boardId) {
-    try {
-      await withLoading(async () => {
+    await withProcess(
+      "SET_DATA_LOADING",
+      async () => {
         await deleteTasksByBoard(boardId);
         await deleteColumnsByBoard(boardId);
         await deleteBoardById(boardId);
@@ -218,10 +217,9 @@ export function createBoardActions(stateRef, dispatch) {
             payload: { columns: [], tasks: [] },
           });
         }
-      });
-    } catch (err) {
-      throw err;
-    }
+      },
+      "Failed to delete board.",
+    );
   }
 
   async function updateColumns(boardId, newColumnData) {
@@ -282,28 +280,28 @@ export function createBoardActions(stateRef, dispatch) {
 
     const order = (columnTaskIds[column.id] || []).length;
 
-    try {
-      await withLoading(async () => {
-        const taskId = await createTaskInDb(
-          state.activeBoardId,
-          column.id,
-          title,
-          description,
-          order,
-        );
+    await withProcess("SET_DATA_LOADING", async () => {
+      const taskId = await createTaskInDb(
+        state.activeBoardId,
+        column.id,
+        title,
+        description,
+        order,
+      );
 
-        const createdSubtasks = await Promise.all(
-          subtasks.map((s, i) =>
-            createSubtaskInDb(taskId, s.title, false, i).then((id) => ({
-              id,
-              title: s.title,
-              isCompleted: false,
-              order: i,
-            })),
-          ),
-        );
+      const createdSubtasks = await Promise.all(
+        subtasks.map((s, i) =>
+          createSubtaskInDb(taskId, s.title, false, i).then((id) => ({
+            id,
+            title: s.title,
+            isCompleted: false,
+            order: i,
+          })),
+        ),
+      );
 
-        dispatch({
+      dispatch(
+        {
           type: "ADD_TASK",
           payload: {
             id: taskId,
@@ -314,12 +312,10 @@ export function createBoardActions(stateRef, dispatch) {
             order,
             subtasks: createdSubtasks,
           },
-        });
-      });
-    } catch (err) {
-      console.log("Failed to create task:", err);
-      throw err;
-    }
+        },
+        "Failed to create task",
+      );
+    });
   }
 
   async function moveTask(taskId, newColumnId) {

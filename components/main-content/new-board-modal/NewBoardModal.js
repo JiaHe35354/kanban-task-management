@@ -21,16 +21,16 @@ import CrossIcon from "@/assets/icon-cross.svg";
 import "@/app/globals.css";
 
 const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
-  const [mounted, setMounted] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [boardName, setBoardName] = useState("");
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [columns, setColumns] = useState([
     { id: crypto.randomUUID(), name: "" },
   ]);
+  const [mounted, setMounted] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState(null);
 
-  const { boards, isDataLoading } = useContext(BoardStateContext);
+  const { isDataLoading } = useContext(BoardStateContext);
   const { createNewBoard } = useContext(BoardActionsContext);
 
   const dialog = useRef();
@@ -68,6 +68,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
 
   function handleAddColumn() {
     setColumns((prev) => [...prev, { id: crypto.randomUUID(), name: "" }]);
+    setSubmitted(false);
   }
 
   function handleUpdateColumn(id, value) {
@@ -164,7 +165,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
         </div>
 
         <div className="formControl">
-          <label htmlFor="columns">Columns</label>
+          <label>Columns</label>
 
           <div className="rowsWrapper">
             {columns.map((column) => {
@@ -175,8 +176,8 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
                   <div className="inputWrapper">
                     <input
                       type="text"
-                      disabled={isDataLoading}
                       value={column.name}
+                      disabled={isDataLoading}
                       onChange={(e) =>
                         handleUpdateColumn(column.id, e.target.value)
                       }

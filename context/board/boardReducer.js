@@ -6,7 +6,7 @@ export const initialState = {
   columnTaskIds: {},
 
   activeBoardId: null,
-  isBoardLoading: true,
+  isBoardLoading: null,
   isDataLoading: false,
   error: null,
 };
@@ -46,6 +46,10 @@ export function boardReducer(state, action) {
       tasksById,
       columnTaskIds,
     };
+  }
+
+  if (action.type === "RESET_STATE") {
+    return initialState;
   }
 
   if (action.type === "SET_ACTIVE_BOARD") {

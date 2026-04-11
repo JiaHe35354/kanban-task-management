@@ -27,29 +27,30 @@ export default function TaskModalsHost() {
     const edit = editRef.current;
     const del = deleteRef.current;
 
-    if (!activeTask || !activeModal) {
+    if (activeTask && activeModal) {
+      if (activeModal === "details") {
+        details?.open?.();
+        edit?.close?.();
+        del?.close?.();
+      }
+      if (activeModal === "edit") {
+        edit?.open?.();
+        details?.close?.();
+        del?.close?.();
+      }
+      if (activeModal === "delete") {
+        del?.open?.();
+        details?.close?.();
+        edit?.close?.();
+      }
+    } else {
       details?.close?.();
       edit?.close?.();
       del?.close?.();
-      return;
-    }
-
-    if (activeModal === "details") {
-      details?.open?.();
-      edit?.close?.();
-      del?.close?.();
-    } else if (activeModal === "edit") {
-      details?.close?.();
-      edit?.open?.();
-      del?.close?.();
-    } else if (activeModal === "delete") {
-      details?.close?.();
-      edit?.close?.();
-      del?.open?.();
     }
   }, [activeTask, activeModal]);
 
-  if (!activeTask) return null;
+  // if (!activeTask) return null;
 
   function handleOpenEditTask() {
     openEditTask(activeTask.id);
@@ -63,7 +64,7 @@ export default function TaskModalsHost() {
     <>
       <TaskDetailsModal
         ref={detailsRef}
-        task={activeTask}
+        task={activeTask || { title: "", subtasks: [] }}
         columns={columns}
         currentColumn={currentColumn}
         onOpenEdit={handleOpenEditTask}

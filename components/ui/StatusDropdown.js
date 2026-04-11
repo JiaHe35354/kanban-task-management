@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
 import classes from "./StatusDropdown.module.css";
@@ -8,6 +8,21 @@ export default function StatusDropDown({ value, options, onChange, disabled }) {
   const [dropdownPos, setDropdownPos] = useState(null);
 
   const buttonRef = useRef();
+  const containerRef = useRef();
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
 
   function toggleMenu() {
     if (disabled) return;
@@ -32,10 +47,10 @@ export default function StatusDropDown({ value, options, onChange, disabled }) {
   }
 
   return (
-    <div className={classes.dropdown}>
+    <div className={classes.dropdown} ref={containerRef}>
       <button
-        type="button"
         ref={buttonRef}
+        type="button"
         className={classes.statusBtn}
         disabled={disabled}
         onClick={toggleMenu}

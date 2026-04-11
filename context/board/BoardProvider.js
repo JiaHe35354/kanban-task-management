@@ -1,22 +1,16 @@
 "use client";
 
-import {
-  createContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { boardReducer, initialState } from "./BoardReducer";
+import { createContext, useEffect, useMemo, useReducer, useRef } from "react";
+import { useAuth } from "../AuthContext";
+import { boardReducer, initialState } from "./boardReducer";
 import { createBoardActions } from "./boardActions";
 
 export const BoardStateContext = createContext(initialState);
 export const BoardActionsContext = createContext(null);
 
 export function BoardProvider({ children }) {
+  const { user, loading: authLoading } = useAuth();
   const [state, dispatch] = useReducer(boardReducer, initialState);
-
   const stateRef = useRef(state);
 
   useEffect(() => {
@@ -24,46 +18,33 @@ export function BoardProvider({ children }) {
   }, [state]);
 
   const actions = useMemo(() => {
-    return createBoardActions(stateRef, dispatch);
-  }, [dispatch]);
+    return createBoardActions(stateRef, dispatch, user?.uid);
+  }, [user?.uid]);
 
   useEffect(() => {
-    async function init() {
-      dispatch({ type: "SET_BOARD_LOADING", payload: true });
-      try {
-        await actions.loadBoards();
-      } catch (err) {
-        dispatch({ type: "SET_ERROR", payload: "Failed to load boards" });
-      } finally {
-        dispatch({ type: "SET_BOARD_LOADING", payload: false });
-      }
-    }
+    const isProtectedPage = window.location.pathname.startsWith("/boards");
 
-    init();
-  }, [actions]);
+    if (user?.uid && isProtectedPage) {
+      actions.loadBoards();
+    }
+  }, [user?.uid, actions]);
 
   useEffect(() => {
-    async function fetchData() {
-      if (!state.activeBoardId) return;
-
-      try {
-        dispatch({ type: "SET_DATA_LOADING", payload: true });
-        await actions.loadBoardData(state.activeBoardId);
-      } catch (err) {
-        console.error("Failed to load board:", err);
-      } finally {
-        // This ensures the spinner stops whether it worked OR crashed
-        dispatch({ type: "SET_DATA_LOADING", payload: false });
-      }
+    if (!user && !authLoading) {
+      dispatch({ type: "RESET_STATE" });
     }
+  }, [user, authLoading]);
 
-    fetchData();
+  useEffect(() => {
+    if (state.activeBoardId) {
+      actions.loadBoardData(state.activeBoardId);
+    }
   }, [state.activeBoardId]);
 
   const activeBoard =
     state.boards.find((b) => b.id === state.activeBoardId) ?? null;
 
-  // const tasks = useMemo(() => Object.values(state.tasksById), [state]);
+  if (authLoading) return <div>Authenticating...</div>;
 
   return (
     <BoardStateContext.Provider value={{ ...state, activeBoard }}>

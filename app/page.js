@@ -1,9 +1,22 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-import Board from "@/components/board/Board";
+import { useAuth } from "@/context/AuthContext";
+import AuthForm from "@/components/auth/AuthForm";
 
-import "@/app/globals.css";
+export default function HomePage() {
+  const { user } = useAuth();
+  const router = useRouter();
 
-export default function Home({}) {
-  return <Board />;
+  // If the user is already logged in, send them to their boards automatically
+  useEffect(() => {
+    if (user) router.push("/boards");
+  }, [user, router]);
+
+  return (
+    <main>
+      <AuthForm />
+    </main>
+  );
 }

@@ -1,8 +1,6 @@
 import { Plus_Jakarta_Sans } from "next/font/google";
-import MainContent from "@/components/main-content/MainContent";
+
 import { AuthProvider } from "@/context/AuthContext";
-import { BoardProvider } from "@/context/board/BoardProvider";
-import { ThemeProvider } from "@/context/ThemeContext";
 
 import "./globals.css";
 
@@ -22,14 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="en" className={plusJakartaSans.className}>
       <body className="light">
         <div id="modal-root"></div>
-
-        <AuthProvider>
-          <BoardProvider>
-            <ThemeProvider>
-              <MainContent>{children}</MainContent>
-            </ThemeProvider>
-          </BoardProvider>
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

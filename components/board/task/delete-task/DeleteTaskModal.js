@@ -29,8 +29,12 @@ const DeleteTaskModal = forwardRef(function DeleteTaskModal({ task }, ref) {
 
   useImperativeHandle(ref, () => {
     return {
-      open: () => dialog.current.showModal(),
-      close: () => dialog.current.close(),
+      open: () => {
+        if (dialog.current) dialog.current.showModal();
+      },
+      close: () => {
+        if (dialog.current) dialog.current.close();
+      },
     };
   });
 
@@ -74,7 +78,7 @@ const DeleteTaskModal = forwardRef(function DeleteTaskModal({ task }, ref) {
 
       <section>
         <p className="deleteText">
-          {`Are you sure you want to delete the "${task.title}" task and its subtasks? This action cannot be 
+          {`Are you sure you want to delete the "${task?.title}" task and its subtasks? This action cannot be 
           reversed.`}
         </p>
 

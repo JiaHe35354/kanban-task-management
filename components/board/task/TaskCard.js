@@ -31,6 +31,7 @@ function TaskCard({ task }) {
   const { total, completed } = getSubtaskStats(task.subtasks);
 
   function handleOpenDetails() {
+    console.log("Open task details");
     openTaskDetails(task.id);
   }
 
