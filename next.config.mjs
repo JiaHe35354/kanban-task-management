@@ -2,7 +2,14 @@
 const nextConfig = {
   // This tells Next.js 16: "I know Turbopack is the default, but I'm not ready yet"
   experimental: {
-    turbopack: {},
+    turbopack: {
+      rules: {
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+        },
+      },
+    },
   },
   webpack(config) {
     config.module.rules.push({
