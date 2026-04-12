@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import ChevronDownIcon from "@/assets/icon-chevron-down.svg";
-import classes from "./StatusDropdown.module.css";
+import classes from "./StatusDropDown.module.css";
 
 export default function StatusDropDown({ value, options, onChange, disabled }) {
   const [menuOpen, setMenuOpen] = useState(false);
