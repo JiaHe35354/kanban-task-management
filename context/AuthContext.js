@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) return;
+
     // This "listener" checks if a user is already logged in when the page loads
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {

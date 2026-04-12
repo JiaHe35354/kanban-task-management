@@ -12,13 +12,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app =
-  typeof window !== "undefined" && getApps().length === 0
-    ? initializeApp(firebaseConfig)
-    : getApp();
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Export Firebase services
-export const db = app ? getFirestore(app) : null; //Firestore DB;
-export const auth = app ? getAuth(app) : null; //Authentication
+export const db = typeof window !== "undefined" ? getFirestore(app) : null; //Firestore DB;
+export const auth = typeof window !== "undefined" ? getAuth(app) : null; //Authentication
 
 export default app;
