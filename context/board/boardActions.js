@@ -398,25 +398,31 @@ export function createBoardActions(stateRef, dispatch, userId) {
   async function reorderColumnTasks(updatedTasks) {
     const state = stateRef.current;
 
-    const previousTasks = structuredClone(state.tasksById);
-    const previousColumnIds = structuredClone(state.columnTaskIds);
+    // const previousTasks = structuredClone(state.tasksById);
+    // const previousColumnIds = structuredClone(state.columnTaskIds);
+
+    if (!updatedTasks || updatedTasks.length === 0) return;
 
     try {
-      const tasksToUpdate = updatedTasks.filter((task) => {
-        const original = previousTasks[task.id];
-        return (
-          original &&
-          (original.order !== task.order || original.columnId !== task.columnId)
-        );
-      });
+      // const tasksToUpdate = updatedTasks.filter((task) => {
+      //   const original = previousTasks[task.id];
+      //   return (
+      //     original &&
+      //     (original.order !== task.order || original.columnId !== task.columnId)
+      //   );
+      // });
 
-      if (tasksToUpdate.length === 0) return;
+      // if (tasksToUpdate.length === 0) return;
+
+      console.log("SENDING TO DB:", updatedTasks);
 
       await Promise.all(
-        tasksToUpdate.map((task) =>
+        updatedTasks.map((task) =>
           moveTaskInDb(task.id, task.columnId, task.order),
         ),
       );
+
+      console.log("DB SYNC COMPLETE");
     } catch (err) {
       console.log("Failed to sync reorder:", err);
 

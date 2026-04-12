@@ -96,7 +96,6 @@ export default function Board() {
 
     if (!activeCol || !overCol) return;
 
-    // const isRealColumn = Object.keys(columnTaskIds).includes(String(overCol));
     const isRealColumn = !!columnTaskIds[overCol];
 
     if (!isRealColumn) return;
@@ -123,59 +122,71 @@ export default function Board() {
 
     if (!over) return;
 
-    const activeId = active.id;
-    const overId = over.id;
-
     const activeCol = active.data.current?.sortable?.containerId;
     const overCol = over.data.current?.sortable?.containerId || over.id;
 
     if (!activeCol || !overCol) return;
 
-    const targetIds = [...(columnTaskIds[overCol] || [])];
+    // 1. Get the current IDs from the STATE (which was updated by onDragOver)
+    const sourceIds = columnTaskIds[activeCol] || [];
+    const targetIds = columnTaskIds[overCol] || [];
 
-    let newIndex;
+    const finalUpdates = [];
 
-    if (overId === overCol) {
-      newIndex = targetIds.length;
-    } else {
-      newIndex = targetIds.indexOf(overId);
-      if (newIndex === -1) newIndex = targetIds.length;
+    // 2. Build updates for source column
+    sourceIds.forEach((id, i) => {
+      finalUpdates.push({ id, columnId: activeCol, order: i });
+    });
+
+    // 3. Build updates for target column (if different)
+    if (activeCol !== overCol) {
+      targetIds.forEach((id, i) => {
+        finalUpdates.push({ id, columnId: overCol, order: i });
+      });
     }
 
-    let finalUpdates = [];
-
-    // SAME COLUMN SORTING
-    if (activeCol === overCol) {
-      const oldIndex = targetIds.indexOf(activeId);
-
-      // Only update if the position actually changed
-      if (oldIndex !== newIndex && oldIndex !== -1) {
-        const newOrderIds = arrayMove(targetIds, oldIndex, newIndex);
-
-        finalUpdates = newOrderIds.map((id, index) => ({
-          id,
-          columnId: activeCol,
-          order: index,
-        }));
-      }
-    } else {
-      // CROSS COLUMN UPDATING:
-      finalUpdates = getIntermediatePayload(
-        activeId,
-        activeCol,
-        overId,
-        overCol,
-        columnTaskIds,
-      );
-    }
-
+    // 4. Send to DB
     if (finalUpdates.length > 0) {
-      // Instant UI update
-      reorderTasksLocal(finalUpdates);
-
-      // Database sync
+      console.log("SYNCING TO DB:", finalUpdates);
       await reorderColumnTasks(finalUpdates);
     }
+
+    // if (activeCol === overCol) {
+    //   const targetIds = [...(columnTaskIds[overCol] || [])];
+    //   const oldIndex = targetIds.indexOf(activeId);
+    //   let newIndex = targetIds.indexOf(overId);
+    //   if (newIndex === -1) newIndex = targetIds.length;
+
+    //   // Only update if the position actually changed
+    //   if (oldIndex !== newIndex && oldIndex !== -1) {
+    //     const newOrderIds = arrayMove(targetIds, oldIndex, newIndex);
+
+    //     finalUpdates = newOrderIds.map((id, index) => ({
+    //       id,
+    //       columnId: activeCol,
+    //       order: index,
+    //     }));
+    //   }
+    // } else {
+    //   // CROSS COLUMN UPDATING:
+    //   finalUpdates = getIntermediatePayload(
+    //     activeId,
+    //     activeCol,
+    //     overId,
+    //     overCol,
+    //     columnTaskIds,
+    //   );
+    // }
+
+    // console.log("Final Updates Generated:", finalUpdates);
+
+    // if (finalUpdates && finalUpdates.length > 0) {
+    //   // Instant UI update
+    //   reorderTasksLocal(finalUpdates);
+
+    //   // Database sync
+    //   await reorderColumnTasks(finalUpdates);
+    // }
   }
 
   return (
