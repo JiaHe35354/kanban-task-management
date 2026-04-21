@@ -46,7 +46,7 @@ function getIntermediatePayload(
   } else {
     nextIndex = targetIds.indexOf(overId);
     // If we can't find the task we're over, default to the bottom
-    if (nextIndex === -1) nextIndex = targetIds.length;
+    // if (nextIndex === -1) nextIndex = targetIds.length;
   }
 
   // 3. Insert into the new position
@@ -65,7 +65,6 @@ function getIntermediatePayload(
     updates.push({ id, columnId: overCol, order: i });
   });
 
-  console.log(updates);
   return updates;
 }
 
@@ -86,22 +85,108 @@ export default function Board() {
 
   const activeTask = activeId ? tasksById[activeId] : null;
 
+  // function handleDragOver(event) {
+  //   const { active, over } = event;
+  //   if (!over || active.id === over.id) return;
+
+  //   // This comes from dnd-kit’s live internal state:
+  //   const activeCol = active.data.current?.sortable?.containerId;
+  //   const overCol = over.data.current?.sortable?.containerId || over.id;
+  //   console.log("ACTIVE COL:", activeCol, "OVER COL:", overCol);
+
+  //   if (!activeCol || !overCol) return;
+
+  //   // Check if the thing user is currently hovering over (overCol) actually exists as a key in the state (columnTaskIds).
+  //   const isRealColumn = !!columnTaskIds[overCol];
+
+  //   if (!isRealColumn) return;
+
+  //   // Moving between columns
+  //   if (activeCol && overCol && activeCol !== overCol) {
+  //     const updates = getIntermediatePayload(
+  //       active.id,
+  //       activeCol,
+  //       over.id,
+  //       overCol,
+  //       columnTaskIds,
+  //     );
+
+  //     if (updates) {
+  //       reorderTasksLocal(updates);
+  //     }
+  //   }
+  // }
+
+  // async function handleDragEnd(event) {
+  //   const { active, over } = event;
+  //   setActiveId(null);
+
+  //   if (!over) return;
+
+  //   const activeId = active.id;
+  //   const overId = over.id;
+
+  //   // Use the containerId (column id) from dnd-kit data
+  //   const activeCol = active.data.current?.sortable?.containerId;
+  //   const overCol = over.data.current?.sortable?.containerId || over.id;
+
+  //   if (!activeCol || !overCol) return;
+
+  //   let finalUpdates = [];
+
+  //   if (activeCol === overCol) {
+  //     // --- SAME COLUMN REORDERING ---
+  //     const currentIds = [...(columnTaskIds[activeCol] || [])];
+  //     const oldIndex = currentIds.indexOf(activeId);
+
+  //     let newIndex = currentIds.indexOf(overId);
+
+  //     // If dropping over the column container
+  //     if (newIndex === -1) newIndex = currentIds.length - 1;
+
+  //     if (oldIndex !== -1 && oldIndex !== newIndex) {
+  //       const newOrderIds = arrayMove(currentIds, oldIndex, newIndex);
+
+  //       finalUpdates = newOrderIds.map((id, index) => ({
+  //         id,
+  //         columnId: activeCol,
+  //         order: index,
+  //       }));
+
+  //       reorderTasksLocal(finalUpdates);
+  //     }
+  //   } else {
+  //     // --- CROSS-COLUMN REORDERING ---
+  //     // Since onDragOver already handled the local state move, we just take the current state and sync to DB.
+  //     const sourceIds = columnTaskIds[activeCol] || [];
+  //     const targetIds = columnTaskIds[overCol] || [];
+
+  //     sourceIds.forEach((id, i) => {
+  //       finalUpdates.push({ id, columnId: activeCol, order: i });
+  //     });
+
+  //     targetIds.forEach((id, i) => {
+  //       finalUpdates.push({ id, columnId: overCol, order: i });
+  //     });
+  //   }
+
+  //   if (finalUpdates.length > 0) {
+  //     console.log("SYNCING TO DB:", finalUpdates);
+  //     await reorderColumnTasks(finalUpdates);
+  //   }
+  // }
+
   function handleDragOver(event) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    // This comes from dnd-kit’s live internal state:
     const activeCol = active.data.current?.sortable?.containerId;
     const overCol = over.data.current?.sortable?.containerId || over.id;
 
-    if (!activeCol || !overCol) return;
+    if (!activeCol || !overCol || !columnTaskIds[overCol]) return;
 
-    const isRealColumn = !!columnTaskIds[overCol];
-
-    if (!isRealColumn) return;
-
-    // Moving between columns
-    if (activeCol && overCol && activeCol !== overCol) {
+    // --- CASE A: MOVING BETWEEN COLUMNS ---
+    if (activeCol !== overCol) {
       const updates = getIntermediatePayload(
         active.id,
         activeCol,
@@ -110,7 +195,30 @@ export default function Board() {
         columnTaskIds,
       );
 
-      if (updates) {
+      // Check if the task's column in state is already the overCol
+      // to prevent infinite updates while hovering in the new column
+      if (tasksById[active.id].columnId !== overCol) {
+        reorderTasksLocal(updates);
+      }
+    }
+
+    // --- CASE B: MOVING WITHIN SAME COLUMN ---
+    else {
+      const currentIds = columnTaskIds[activeCol];
+      const oldIndex = currentIds.indexOf(active.id);
+      let newIndex = currentIds.indexOf(over.id);
+
+      if (newIndex === -1) newIndex = currentIds.length - 1;
+
+      // ONLY dispatch if the index actually changed
+      if (oldIndex !== newIndex && oldIndex !== -1) {
+        const newOrderIds = arrayMove(currentIds, oldIndex, newIndex);
+        const updates = newOrderIds.map((id, index) => ({
+          id,
+          columnId: activeCol,
+          order: index,
+        }));
+
         reorderTasksLocal(updates);
       }
     }
@@ -127,66 +235,26 @@ export default function Board() {
 
     if (!activeCol || !overCol) return;
 
-    // 1. Get the current IDs from the STATE (which was updated by onDragOver)
-    const sourceIds = columnTaskIds[activeCol] || [];
-    const targetIds = columnTaskIds[overCol] || [];
-
+    // The local state is already correct because of handleDragOver.
+    // We just collect all tasks in the affected columns and sync.
     const finalUpdates = [];
+    const sourceIds = columnTaskIds[activeCol] || [];
 
-    // 2. Build updates for source column
     sourceIds.forEach((id, i) => {
       finalUpdates.push({ id, columnId: activeCol, order: i });
     });
 
-    // 3. Build updates for target column (if different)
     if (activeCol !== overCol) {
+      const targetIds = columnTaskIds[overCol] || [];
       targetIds.forEach((id, i) => {
         finalUpdates.push({ id, columnId: overCol, order: i });
       });
     }
 
-    // 4. Send to DB
     if (finalUpdates.length > 0) {
-      console.log("SYNCING TO DB:", finalUpdates);
+      console.log("SYNCING FINAL STATE TO DB:", finalUpdates);
       await reorderColumnTasks(finalUpdates);
     }
-
-    // if (activeCol === overCol) {
-    //   const targetIds = [...(columnTaskIds[overCol] || [])];
-    //   const oldIndex = targetIds.indexOf(activeId);
-    //   let newIndex = targetIds.indexOf(overId);
-    //   if (newIndex === -1) newIndex = targetIds.length;
-
-    //   // Only update if the position actually changed
-    //   if (oldIndex !== newIndex && oldIndex !== -1) {
-    //     const newOrderIds = arrayMove(targetIds, oldIndex, newIndex);
-
-    //     finalUpdates = newOrderIds.map((id, index) => ({
-    //       id,
-    //       columnId: activeCol,
-    //       order: index,
-    //     }));
-    //   }
-    // } else {
-    //   // CROSS COLUMN UPDATING:
-    //   finalUpdates = getIntermediatePayload(
-    //     activeId,
-    //     activeCol,
-    //     overId,
-    //     overCol,
-    //     columnTaskIds,
-    //   );
-    // }
-
-    // console.log("Final Updates Generated:", finalUpdates);
-
-    // if (finalUpdates && finalUpdates.length > 0) {
-    //   // Instant UI update
-    //   reorderTasksLocal(finalUpdates);
-
-    //   // Database sync
-    //   await reorderColumnTasks(finalUpdates);
-    // }
   }
 
   return (
@@ -213,7 +281,6 @@ export default function Board() {
           duration: 400,
           easing: "ease",
         }}
-        // wrapperElement="ul"
       >
         {activeId ? <TaskOverlay task={activeTask} /> : null}
       </DragOverlay>

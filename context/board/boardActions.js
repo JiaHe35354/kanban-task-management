@@ -414,15 +414,11 @@ export function createBoardActions(stateRef, dispatch, userId) {
 
       // if (tasksToUpdate.length === 0) return;
 
-      console.log("SENDING TO DB:", updatedTasks);
-
       await Promise.all(
         updatedTasks.map((task) =>
           moveTaskInDb(task.id, task.columnId, task.order),
         ),
       );
-
-      console.log("DB SYNC COMPLETE");
     } catch (err) {
       console.log("Failed to sync reorder:", err);
 

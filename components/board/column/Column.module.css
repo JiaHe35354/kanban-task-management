@@ -3,7 +3,10 @@
   display: flex;
   gap: 2.5rem;
   padding-right: 2.5rem;
-  height: 100%;
+  height: max-content;
+  min-height: 100%;
+  width: max-content;
+  min-width: 100%;
 }
 
 .columnListItem,
@@ -13,6 +16,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  padding-bottom: 5rem;
 }
 
 .columnHeader {
@@ -20,6 +24,7 @@
   align-items: center;
   gap: 1.2rem;
   margin-bottom: 2.5rem;
+  flex-shrink: 0;
 }
 
 .dot {
@@ -40,7 +45,7 @@
 .newColumn {
   background-image: var(--background-tertiary);
   height: 80vh;
-  margin-right: 2.5rem;
+
   margin-top: 4rem;
   border-radius: 0.8rem;
   display: flex;

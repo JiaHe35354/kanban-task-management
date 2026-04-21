@@ -49,7 +49,7 @@ function Column({ column }) {
         items={taskIds}
         strategy={verticalListSortingStrategy}
       >
-        <TaskList columnId={column.id} tasks={columnTasks} />
+        <TaskList tasks={columnTasks} />
       </SortableContext>
     </li>
   );

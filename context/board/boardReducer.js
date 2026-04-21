@@ -158,14 +158,14 @@ export function boardReducer(state, action) {
     const tasksById = { ...state.tasksById };
     const columnTaskIds = { ...state.columnTaskIds };
 
-    // 1. Update tasksById
+    // 1. Update the individual task objects (for the 'order' and 'columnId' property)
     updatedTasks.forEach((task) => {
       if (tasksById[task.id]) {
         tasksById[task.id] = { ...tasksById[task.id], ...task };
       }
     });
 
-    // 2. Only rebuild the columns present in the payload
+    // 2. Optimized Column Update:
     const affectedColumns = [...new Set(updatedTasks.map((t) => t.columnId))];
 
     affectedColumns.forEach((colId) => {

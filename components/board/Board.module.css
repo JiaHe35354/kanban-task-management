@@ -1,39 +1,6 @@
 .board {
-  padding: 2.5rem;
+  padding: 2.5rem 0 2.5rem 2.5rem;
   height: 100%;
   overflow-x: scroll;
   overflow-y: scroll;
-}
-
-.overlay {
-  box-sizing: border-box;
-  width: 100%;
-  list-style: none;
-  background-color: var(--background);
-  border-radius: 0.8rem;
-  box-shadow: 0 0.5rem 0.8rem rgba(107, 118, 134, 0.2);
-}
-
-.taskBtn {
-  width: 100%;
-  background-color: transparent;
-  border: none;
-  padding: 2.3rem 1.8rem;
-  color: inherit;
-  font-family: inherit;
-  text-align: start;
-}
-
-.taskTitle {
-  color: var(--text-color1);
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.8rem;
-  transition: var(--transition);
-}
-
-.subtasks {
-  color: var(--text-color2);
-  font-size: 1.2rem;
-  font-weight: bold;
 }
