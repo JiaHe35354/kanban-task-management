@@ -2,15 +2,15 @@ import TaskCard from "./TaskCard";
 
 import classes from "./Task.module.css";
 
-export default function TaskList({ tasks }) {
+export default function TaskList({ taskIds }) {
   return (
     <ul
       className={`${classes.taskList} ${
-        tasks.length === 0 ? classes.emptyList : ""
+        taskIds.length === 0 ? classes.emptyList : ""
       }`}
     >
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+      {taskIds.map((id) => (
+        <TaskCard key={id} id={id} />
       ))}
     </ul>
   );

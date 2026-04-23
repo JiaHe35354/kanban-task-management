@@ -11,19 +11,15 @@ import {
 } from "@dnd-kit/sortable";
 
 function Column({ column }) {
-  const { tasksById, columnTaskIds } = useContext(BoardStateContext);
+  const { columnTaskIds } = useContext(BoardStateContext);
 
+  // Get only the IDs
   const taskIds = useMemo(
     () => columnTaskIds?.[column.id] ?? [],
     [columnTaskIds, column.id],
   );
 
-  const columnTasks = useMemo(() => {
-    return taskIds.map((id) => tasksById[id]).filter(Boolean);
-  }, [taskIds, tasksById]);
-
-  const tasksCount = columnTasks.length;
-
+  // Tell dnd-kit this is a Column and pass its ID for handleDragOver/End
   const { setNodeRef } = useDroppable({
     id: column.id,
     data: {
@@ -33,7 +29,7 @@ function Column({ column }) {
   });
 
   return (
-    <li ref={setNodeRef} className={classes.columnListItem}>
+    <li className={classes.columnListItem}>
       <div className={classes.columnHeader}>
         <span
           className={classes.dot}
@@ -41,16 +37,18 @@ function Column({ column }) {
         />
         <p
           className={classes.columnTitle}
-        >{`${column.name} (${tasksCount})`}</p>
+        >{`${column.name} (${taskIds.length})`}</p>
       </div>
 
-      <SortableContext
-        id={column.id}
-        items={taskIds}
-        strategy={verticalListSortingStrategy}
-      >
-        <TaskList tasks={columnTasks} />
-      </SortableContext>
+      <div ref={setNodeRef} className={classes.columnBody}>
+        <SortableContext
+          id={column.id}
+          items={taskIds} // dnd-kit works best when items is just a list of IDs
+          strategy={verticalListSortingStrategy}
+        >
+          <TaskList taskIds={taskIds} />
+        </SortableContext>
+      </div>
     </li>
   );
 }

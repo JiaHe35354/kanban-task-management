@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useContext } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -6,9 +6,13 @@ import { useTaskModal } from "@/context/board/TaskModalContext";
 import { getSubtaskStats } from "@/utils/taskHelper";
 
 import classes from "./Task.module.css";
+import { BoardStateContext } from "@/context/board/BoardProvider";
 
-function TaskCard({ task }) {
+function TaskCard({ id }) {
+  const { tasksById } = useContext(BoardStateContext);
   const { openTaskDetails } = useTaskModal();
+
+  const task = tasksById[id];
 
   const {
     attributes,
@@ -18,21 +22,19 @@ function TaskCard({ task }) {
     transition,
     isDragging,
   } = useSortable({
-    id: task.id,
+    id: id,
     animateLayoutChanges: () => true,
   });
 
   const style = {
-    transition: transition || "transform 500ms cubic-bezier(0.2, 0, 0, 1)",
+    transition: transition,
     transform: CSS.Transform.toString(transform),
-    opacity: isDragging ? 0 : 1,
+    opacity: isDragging ? 0.3 : 1,
   };
 
-  const { total, completed } = getSubtaskStats(task.subtasks);
+  if (!task) return null;
 
-  function handleOpenDetails() {
-    openTaskDetails(task.id);
-  }
+  const { total, completed } = getSubtaskStats(task.subtasks);
 
   return (
     <>
@@ -40,10 +42,9 @@ function TaskCard({ task }) {
         <button
           type="button"
           className={classes.taskBtn}
-          style={{ opacity: isDragging ? 0 : 1 }}
           {...listeners}
           {...attributes}
-          onClick={handleOpenDetails}
+          onClick={() => openTaskDetails(id)}
         >
           <h3 className={classes.taskTitle}>{task.title}</h3>
           <p className={classes.subtaskTitle}>

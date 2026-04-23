@@ -42,6 +42,11 @@
   text-transform: uppercase;
 }
 
+.columnBody {
+  min-height: 80vh;
+  height: 100%;
+}
+
 .newColumn {
   background-image: var(--background-tertiary);
   height: 80vh;

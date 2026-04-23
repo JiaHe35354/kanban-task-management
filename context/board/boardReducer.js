@@ -153,22 +153,27 @@ export function boardReducer(state, action) {
     };
   }
 
+  // --- TO REVIEW ---
   if (action.type === "REORDER_MULTIPLE_TASKS") {
-    const updatedTasks = action.payload;
+    const updatedTasks = action.payload; // Array of {id, columnId, order}
     const tasksById = { ...state.tasksById };
     const columnTaskIds = { ...state.columnTaskIds };
 
-    // 1. Update the individual task objects (for the 'order' and 'columnId' property)
-    updatedTasks.forEach((task) => {
-      if (tasksById[task.id]) {
-        tasksById[task.id] = { ...tasksById[task.id], ...task };
-      }
+    // 1. Identify which columns need a full refresh
+    const affectedColumnIds = new Set();
+
+    updatedTasks.forEach((update) => {
+      const oldColumnId = tasksById[update.id]?.columnId;
+      if (oldColumnId) affectedColumnIds.add(oldColumnId); // Add source column
+
+      // Update the task record itself
+      tasksById[update.id] = { ...tasksById[update.id], ...update };
+
+      affectedColumnIds.add(update.columnId); // Add target column
     });
 
-    // 2. Optimized Column Update:
-    const affectedColumns = [...new Set(updatedTasks.map((t) => t.columnId))];
-
-    affectedColumns.forEach((colId) => {
+    // 2. Re-build the ID arrays for only the affected columns
+    affectedColumnIds.forEach((colId) => {
       columnTaskIds[colId] = Object.values(tasksById)
         .filter((t) => t.columnId === colId)
         .sort((a, b) => a.order - b.order)
@@ -176,6 +181,18 @@ export function boardReducer(state, action) {
     });
 
     return { ...state, tasksById, columnTaskIds };
+  }
+
+  if (action.type === "REORDER_COLUMN_IDS") {
+    const { columnId, newOrderIds } = action.payload;
+
+    return {
+      ...state,
+      columnTaskIds: {
+        ...state.columnTaskIds,
+        [columnId]: newOrderIds,
+      },
+    };
   }
 
   if (action.type === "ROLLBACK_TASKS") {

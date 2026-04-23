@@ -75,7 +75,10 @@ export function createBoardActions(stateRef, dispatch, userId) {
           }),
         );
 
-        const { tasksById, columnTaskIds } = normalizeTasks(tasksWithSubtasks);
+        const { tasksById, columnTaskIds } = normalizeTasks(
+          tasksWithSubtasks,
+          cols,
+        );
         // console.log("tasksById:", tasksById, "columnTaskIds:", columnTaskIds);
 
         dispatch({
@@ -439,6 +442,13 @@ export function createBoardActions(stateRef, dispatch, userId) {
     });
   }
 
+  function reorderColumnIds(columnId, newOrderIds) {
+    dispatch({
+      type: "REORDER_COLUMN_IDS",
+      payload: { columnId, newOrderIds },
+    });
+  }
+
   async function editTask({ taskId, title, description, status, subtasks }) {
     try {
       const state = stateRef.current;
@@ -535,6 +545,7 @@ export function createBoardActions(stateRef, dispatch, userId) {
     updateColumns,
     reorderColumnTasks,
     reorderTasksLocal,
+    reorderColumnIds,
     editTask,
     deleteTask,
   };
