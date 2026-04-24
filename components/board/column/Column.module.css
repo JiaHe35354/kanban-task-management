@@ -79,4 +79,17 @@
     padding-right: 1.5rem;
     gap: 1.8rem;
   }
+
+  .columnHeader {
+    margin-bottom: 1.5rem;
+  }
+
+  .columnListItem,
+  .newColumn {
+    width: 24rem;
+  }
+
+  .newColumn {
+    margin-top: 3rem;
+  }
 }

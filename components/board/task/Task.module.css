@@ -53,4 +53,12 @@
   .taskList {
     gap: 1.5rem;
   }
+
+  .taskBtn {
+    padding: 1.8rem 1.2rem;
+  }
+
+  .taskTitle {
+    font-size: 1.4rem;
+  }
 }
