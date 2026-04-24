@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
       {loading ? (
         <div className="authLoadingScreen">
           <div className="spinner"></div>
-          <p>Loading...</p>
+          <p className="authLoadingText">Loading...</p>
         </div>
       ) : (
         children

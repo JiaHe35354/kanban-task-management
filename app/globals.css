@@ -360,9 +360,9 @@ body {
 .authLoadingScreen {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
   height: 100vh;
   background-color: var(--light-grey);
   color: var(--very-dark-grey);

@@ -72,3 +72,11 @@
 .addColumnBtn:hover {
   color: var(--main-purple);
 }
+
+/* 740px */
+@media only screen and (max-width: 46.25em) {
+  .columnList {
+    padding-right: 1.5rem;
+    gap: 1.8rem;
+  }
+}

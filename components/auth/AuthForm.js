@@ -199,7 +199,6 @@ export default function AuthForm() {
                 fill="#ea4335"
               />
             </svg>
-            {/* {isLogin ? "Log in" : "Sign up"} with Google */}
           </button>
         </div>
       </div>

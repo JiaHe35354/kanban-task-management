@@ -1,0 +1,12 @@
+.loadingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--light-grey);
+  color: var(--very-dark-grey);
+}
+
+.loadingText {
+  font-size: 1.8rem;
+}

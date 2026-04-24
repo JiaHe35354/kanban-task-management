@@ -4,3 +4,10 @@
   overflow-x: scroll;
   overflow-y: scroll;
 }
+
+/* 740px */
+@media only screen and (max-width: 46.25em) {
+  .board {
+    padding: 1.5rem 0 1.5rem 1.5rem;
+  }
+}

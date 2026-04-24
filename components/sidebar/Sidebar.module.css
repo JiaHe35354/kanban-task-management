@@ -6,11 +6,15 @@
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  overflow: hidden;
 }
 
 .listWrapper {
   padding-right: 2.5rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .navTitle {
@@ -79,6 +83,12 @@
   color: var(--purple-hover);
 }
 
+.controlsSection {
+  margin-top: auto;
+  padding-top: 2rem;
+  flex-shrink: 0;
+}
+
 .hideSidebarBtn {
   background: transparent;
   border: none;
@@ -131,6 +141,7 @@
   height: 1.8rem;
 }
 
+/* 1024px */
 @media only screen and (max-width: 64em) {
   .hideSidebarBtn {
     padding-left: 1.5rem;
@@ -138,6 +149,7 @@
   }
 }
 
+/* 740px */
 @media only screen and (max-width: 46.25em) {
   .navbar {
     padding-bottom: 1.5rem;

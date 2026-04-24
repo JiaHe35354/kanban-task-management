@@ -65,6 +65,7 @@ export default function Sidebar({
             </ul>
           </>
         )}
+
         <button className={classes.createBtn} onClick={onOpenModal}>
           <BoardIcon className={classes.iconBoard} /> + Create New Board
         </button>

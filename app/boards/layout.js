@@ -20,7 +20,12 @@ export default function DashBoardLayout({ children }) {
     }
   }, [user, loading, router]);
 
-  if (loading || !user) return <p>Loading...</p>;
+  if (loading || !user)
+    return (
+      <div className={classes.loadingWrapper}>
+        <p className={classes.loadingText}>Loading...</p>
+      </div>
+    );
 
   return (
     <BoardProvider>
