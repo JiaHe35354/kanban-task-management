@@ -20,7 +20,7 @@ import CrossIcon from "@/assets/icon-cross.svg";
 
 import "@/app/globals.css";
 
-const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
+const NewBoardModal = forwardRef(function NewBoardModal(_, ref) {
   const [boardName, setBoardName] = useState("");
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [columns, setColumns] = useState([
@@ -156,7 +156,7 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
               }
             />
             {submitted && boardNameInvalid && (
-              <p className="errorText">Can't be empty</p>
+              <p className="errorText">Can&apos;t be empty</p>
             )}
             {submitted && isDuplicate && (
               <p className="errorText">Name already used</p>
@@ -183,7 +183,9 @@ const NewBoardModal = forwardRef(function NewBoardModal({}, ref) {
                       }
                       className={isInvalid ? "inputError" : ""}
                     />
-                    {isInvalid && <p className="errorText">Can't be empty</p>}
+                    {isInvalid && (
+                      <p className="errorText">Can&apos;t be empty</p>
+                    )}
                   </div>
 
                   {columns.length > 1 && (

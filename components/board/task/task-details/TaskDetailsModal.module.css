@@ -66,7 +66,7 @@
   background-color: var(--main-purple-25);
 }
 
-.subtaskItem input[type="checkbox"] {
+.checkbox {
   -webkit-appearance: none;
   appearance: none;
   width: 1.6rem;
@@ -80,11 +80,11 @@
   place-content: center;
 }
 
-.subtaskItem input[type="checkbox"]:checked {
+.checkbox:checked {
   background-color: var(--main-purple);
 }
 
-.subtaskItem input[type="checkbox"]::before {
+.checkbox::before {
   content: "";
   width: 1rem;
   height: 1rem;
@@ -95,11 +95,11 @@
   background-color: var(--white);
 }
 
-.subtaskItem input[type="checkbox"]:checked::before {
+.checkbox:checked::before {
   transform: scale(1);
 }
 
-.subtaskItem input:checked + .subtaskLabel {
+.checkbox:checked + .subtaskLabel {
   opacity: 0.5;
   text-decoration: line-through;
 }

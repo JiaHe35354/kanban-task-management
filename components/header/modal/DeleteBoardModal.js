@@ -17,7 +17,7 @@ import { useModalCleanup } from "@/hooks/useModalCleanup";
 
 import "@/app/globals.css";
 
-const DeleteBoardModal = forwardRef(function DeleteBoardModal({}, ref) {
+const DeleteBoardModal = forwardRef(function DeleteBoardModal(_, ref) {
   const { boards, isDataLoading } = useContext(BoardStateContext);
   const { deleteBoard } = useContext(BoardActionsContext);
 

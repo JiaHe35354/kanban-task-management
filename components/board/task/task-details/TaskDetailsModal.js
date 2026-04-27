@@ -111,6 +111,7 @@ const TaskDetailsModal = forwardRef(function TaskDetailsModal(
                 <input
                   type="checkbox"
                   id={subtask.id}
+                  className={classes.checkbox}
                   disabled={isLoading}
                   checked={subtask.isCompleted}
                   onChange={() => toggleSubtask(task.id, subtask.id)}

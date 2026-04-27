@@ -196,27 +196,10 @@ export function boardReducer(state, action) {
   }
 
   if (action.type === "ROLLBACK_TASKS") {
-    const tasksById = action.payload;
-
-    const columnTaskIds = {};
-
-    Object.values(tasksById).forEach((task) => {
-      if (!columnTaskIds[task.columnId]) {
-        columnTaskIds[task.columnId] = [];
-      }
-
-      columnTaskIds[task.columnId].push(task);
-    });
-
-    for (const columnId in columnTaskIds) {
-      columnTaskIds[columnId] = columnTaskIds[columnId]
-        .sort((a, b) => a.order - b.order)
-        .map((t) => t.id);
-    }
-
     return {
       ...state,
-      ...action.payload,
+      tasksById: action.payload.tasksById,
+      columnTaskIds: action.payload.columnTaskIds,
     };
   }
 

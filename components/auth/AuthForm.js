@@ -154,6 +154,7 @@ export default function AuthForm() {
         </form>
 
         <button
+          type="button"
           className={`${classes.btn} ${classes.demoBtn} focusRing`}
           onClick={handleDemoLogin}
         >
@@ -175,8 +176,11 @@ export default function AuthForm() {
             type="button"
             onClick={handleGoogleLogin}
             className={classes.googleButton}
+            aria-label="Sign in with Google"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               width="18"
               height="18"

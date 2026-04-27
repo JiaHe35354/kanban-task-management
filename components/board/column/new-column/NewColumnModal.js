@@ -21,7 +21,7 @@ import CrossIcon from "@/assets/icon-cross.svg";
 import "@/app/globals.css";
 import classes from "./NewColumnModal.module.css";
 
-const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
+const NewColumnModal = forwardRef(function NewColumnModal(_, ref) {
   const [cols, setCols] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -155,7 +155,7 @@ const NewColumnModal = forwardRef(function NewColumnModal({}, ref) {
                       className={isInvalid ? classes.inputError : ""}
                     />
                     {isInvalid && (
-                      <p className={classes.errorText}>Can't be empty</p>
+                      <p className={classes.errorText}>Can&apos;t be empty</p>
                     )}
                   </div>
 

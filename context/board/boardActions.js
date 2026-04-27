@@ -79,7 +79,6 @@ export function createBoardActions(stateRef, dispatch, userId) {
           tasksWithSubtasks,
           cols,
         );
-        // console.log("tasksById:", tasksById, "columnTaskIds:", columnTaskIds);
 
         dispatch({
           type: "SET_BOARD_DATA",
@@ -401,22 +400,12 @@ export function createBoardActions(stateRef, dispatch, userId) {
   async function reorderColumnTasks(updatedTasks) {
     const state = stateRef.current;
 
-    // const previousTasks = structuredClone(state.tasksById);
-    // const previousColumnIds = structuredClone(state.columnTaskIds);
+    const previousTasks = structuredClone(state.tasksById);
+    const previousColumnIds = structuredClone(state.columnTaskIds);
 
     if (!updatedTasks || updatedTasks.length === 0) return;
 
     try {
-      // const tasksToUpdate = updatedTasks.filter((task) => {
-      //   const original = previousTasks[task.id];
-      //   return (
-      //     original &&
-      //     (original.order !== task.order || original.columnId !== task.columnId)
-      //   );
-      // });
-
-      // if (tasksToUpdate.length === 0) return;
-
       await Promise.all(
         updatedTasks.map((task) =>
           moveTaskInDb(task.id, task.columnId, task.order),

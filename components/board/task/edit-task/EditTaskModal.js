@@ -36,12 +36,12 @@ const EditTaskModal = forwardRef(function EditTaskModal(
   const isMobile = useMediaQuery("(max-width: 46.25em)");
   const { closeTaskModal } = useTaskModal();
 
-  function createFormState(task) {
+  function createFormState(taskData) {
     return {
-      title: task.title,
-      description: task.description,
-      subtasks: task.subtasks?.map((s) => ({ ...s })) ?? [],
-      columnId: task.columnId,
+      title: taskData.title,
+      description: taskData.description,
+      subtasks: taskData.subtasks?.map((s) => ({ ...s })) ?? [],
+      columnId: taskData.columnId,
     };
   }
 
@@ -197,7 +197,7 @@ const EditTaskModal = forwardRef(function EditTaskModal(
               className={submitted && titleInvalid ? classes.inputError : ""}
             />
             {submitted && titleInvalid && (
-              <p className={classes.errorText}>Can't be empty</p>
+              <p className={classes.errorText}>Can&apos;t be empty</p>
             )}
           </div>
         </div>
@@ -235,7 +235,7 @@ const EditTaskModal = forwardRef(function EditTaskModal(
                       className={isInvalid ? classes.inputError : ""}
                     />
                     {isInvalid && (
-                      <p className={classes.errorText}>Can't be empty</p>
+                      <p className={classes.errorText}>Can&apos;t be empty</p>
                     )}
                   </div>
                   <button

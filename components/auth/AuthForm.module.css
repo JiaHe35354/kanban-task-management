@@ -46,7 +46,6 @@
   height: 4.5rem;
   font-size: 1.3rem;
   font-weight: 500;
-  border: 1px solid var(--lines-light);
   border-radius: 0.5rem;
   border: var(--border);
   color: var(--very-dark-grey);

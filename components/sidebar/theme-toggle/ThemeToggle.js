@@ -30,6 +30,7 @@ export default function ThemeToggle() {
             type="radio"
             name="theme"
             id="light"
+            className={classes.radioInput}
             value="light"
             checked={theme === "light"}
             onChange={() => setTheme("light")}
@@ -38,6 +39,7 @@ export default function ThemeToggle() {
             type="radio"
             name="theme"
             id="dark"
+            className={classes.radioInput}
             value="dark"
             checked={theme === "dark"}
             onChange={() => setTheme("dark")}

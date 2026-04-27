@@ -64,16 +64,16 @@
   left: 0.1rem;
 }
 
-.toggle input[type="radio"] {
+.radioInput {
   width: 1.8rem;
   height: 1.8rem;
 }
 
-#light {
+.radioInput:first-child {
   left: 0.5rem;
 }
 
-#dark {
+.radioInput:last-child {
   right: calc(100% - 2rem);
 }
 

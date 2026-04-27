@@ -21,7 +21,7 @@ import StatusDropDown from "@/components/ui/StatusDropDown";
 import "@/app/globals.css";
 import { useModalCleanup } from "@/hooks/useModalCleanup";
 
-const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
+const NewTaskModal = forwardRef(function NewTaskModal(_, ref) {
   const { columns, isDataLoading } = useContext(BoardStateContext);
   const { createNewTask } = useContext(BoardActionsContext);
 
@@ -170,7 +170,7 @@ const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
             />
 
             {submitted && titleInvalid && (
-              <p className="errorText">Can't be empty</p>
+              <p className="errorText">Can&apos;t be empty</p>
             )}
           </div>
         </div>
@@ -207,7 +207,9 @@ const NewTaskModal = forwardRef(function NewTaskModal({}, ref) {
                         handleUpdateSubtask(subtask.id, e.target.value)
                       }
                     />
-                    {isInvalid && <p className="errorText">Can't be empty</p>}
+                    {isInvalid && (
+                      <p className="errorText">Can&apos;t be empty</p>
+                    )}
                   </div>
 
                   {formData.subtasks.length > 1 && (

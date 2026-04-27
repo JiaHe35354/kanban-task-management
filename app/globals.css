@@ -215,7 +215,7 @@ body {
 }
 
 .formControl .inputError {
-  border-color: var(--color-red) !important;
+  border-color: var(--color-red);
 }
 
 .form .errorText {
