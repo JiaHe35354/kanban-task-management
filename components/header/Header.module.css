@@ -24,6 +24,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
 }
 
 .heading {
@@ -32,14 +34,24 @@
   border: none;
   font-family: inherit;
   font-weight: inherit;
+
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  min-width: 0;
 }
 
 .heading h1 {
   font-size: 2.4rem;
-  flex-shrink: 0;
+  flex-shrink: 1;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  min-width: 0;
+  max-width: 25rem;
 }
 
 .chevronIcon {
@@ -53,6 +65,7 @@
 .btnGroup {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .plusBtn {
@@ -79,12 +92,14 @@
   height: 1.2rem;
 }
 
+/* 1024px */
 @media only screen and (max-width: 64em) {
   .heading h1 {
     font-size: 2rem;
   }
 }
 
+/* 740px */
 @media only screen and (max-width: 46.25em) {
   .divider {
     display: none;
@@ -93,5 +108,23 @@
   .heading h1 {
     font-size: 1.8rem;
     margin-left: 1.2rem;
+  }
+}
+
+/* 540px */
+@media only screen and (max-width: 33.75em) {
+  .heading h1 {
+    max-width: 18rem;
+  }
+}
+
+/* 400px */
+@media only screen and (max-width: 25em) {
+  .heading {
+    gap: 0.6rem;
+  }
+
+  .heading h1 {
+    max-width: 14rem;
   }
 }

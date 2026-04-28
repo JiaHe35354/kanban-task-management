@@ -58,7 +58,7 @@ export default function Sidebar({
                     onClick={() => onSelectBoard(board.id)}
                   >
                     <BoardIcon className={classes.iconBoard} />
-                    {board.name}
+                    <span className={classes.boardText}>{board.name}</span>
                   </button>
                 </li>
               ))}

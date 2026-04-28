@@ -17,12 +17,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .statusBtn:hover,
 .statusBtn:focus {
   border-color: var(--main-purple);
   outline: var(--main-purple);
+}
+
+.statusValue {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .statusList {
@@ -54,6 +61,10 @@
   font-size: 1.3rem;
   cursor: pointer;
   transition: var(--transition);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .statusItemBtn:hover {

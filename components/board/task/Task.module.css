@@ -36,6 +36,11 @@
   font-weight: bold;
   margin-bottom: 0.8rem;
   transition: var(--transition);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .taskListItem:hover .taskTitle {

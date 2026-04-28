@@ -55,7 +55,7 @@ export default function StatusDropDown({ value, options, onChange, disabled }) {
         disabled={disabled}
         onClick={toggleMenu}
       >
-        <span>{value}</span>
+        <span className={classes.statusValue}>{value}</span>
         <span className={classes.icon}>
           <ChevronDownIcon />
         </span>

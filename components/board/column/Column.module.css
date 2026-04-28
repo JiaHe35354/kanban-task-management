@@ -32,6 +32,7 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .columnTitle {
@@ -40,6 +41,10 @@
   color: var(--text-color2);
   letter-spacing: 2.4px;
   text-transform: uppercase;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .columnBody {
