@@ -146,6 +146,20 @@ body {
   font-size: 1.3rem;
   line-height: 1.9;
   margin-bottom: 2rem;
+  padding-right: 1rem;
+
+  max-height: 9rem;
+  overflow-y: scroll;
+  word-break: break-word;
+}
+
+.deleteText::-webkit-scrollbar {
+  width: 4px;
+}
+
+.deleteText::-webkit-scrollbar-thumb {
+  background: var(--medium-grey);
+  border-radius: 10px;
 }
 
 /* FORM */
